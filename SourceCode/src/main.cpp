@@ -118,9 +118,23 @@ std::vector<Color> create_fix_color_rectangles_image(const int width, const int 
   return pixels;
 }
 
+std::vector<Color> create_circle_image(const int width, const int height, const int radius = 200)
+{
+  std::vector<Color> pixels(width * height);
+  for (uint32_t y = 0; y < height; y++)
+  {
+    for (uint32_t x = 0; x < width; x++)
+    {
+      const bool isInsideCircle = (std::pow(int(x) - width / 2, 2) + std::pow(int(y) - height / 2, 2) < (radius * radius));
+      pixels[y * width + x] = isInsideCircle ? Color(0.0, 1.0, 1.0) : Color(0.0, 0.0, 0.0);
+    }
+  }
+  return pixels;
+}
+
 int main(int argc, char** argv)
 {
-  std::vector<Color> pixels = create_fix_color_rectangles_image(image_width, image_height, image_width / 100, image_height / 100);
+  std::vector<Color> pixels = create_circle_image(image_width, image_height, 200);
   save_image(pixels, "", image_width, image_height, FileType::png);
   return 0;
 }
