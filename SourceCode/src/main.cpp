@@ -6,6 +6,9 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+#include "color.hpp"
+#include "vec.hpp"
+
 constexpr uint32_t image_width = 1920;
 constexpr uint32_t image_height = 1080;
 
@@ -16,7 +19,7 @@ enum class FileType
 };
 
 // pixel hex values are assumed to be in abgr format
-void save_image(std::vector<uint32_t> pixels, const std::string& name, int width, int height, FileType type = FileType::png)
+void save_image(std::vector<Color> pixels, const std::string& name, int width, int height, FileType type = FileType::png)
 {
   std::string image_path("../../Images/" + name);
   if (!name.empty())
@@ -33,7 +36,9 @@ void save_image(std::vector<uint32_t> pixels, const std::string& name, int width
   if (type == FileType::png)
   {
     image_path.append(".png");
-    stbi_write_png(image_path.c_str(), width, height, 4, pixels.data(), width * 4);
+    std::vector<uint32_t> hex_pixels;
+    for (const auto& color : pixels) hex_pixels.emplace_back(color.get_hex_color());
+    stbi_write_png(image_path.c_str(), width, height, 4, hex_pixels.data(), width * 4);
   }
   else if (type == FileType::ppm)
   {
@@ -45,22 +50,22 @@ void save_image(std::vector<uint32_t> pixels, const std::string& name, int width
       for (uint32_t x = 0; x < width; x++)
       {
         // extract rgb values from hex representation and print to the file
-        uint32_t pixel = pixels[y * width + x];
+        uint32_t pixel = pixels[y * width + x].get_hex_color();
         file << (pixel & 0x000000ff) << " ";
         pixel >>= 8;
         file << (pixel & 0x000000ff) << " ";
         pixel >>= 8;
         file << (pixel & 0x000000ff) << "\t";
       }
-    file << "\n";
+      file << "\n";
     }
-  file.close();
+    file.close();
   }
 }
 
 int main(int argc, char** argv)
 {
-  std::vector<uint32_t> pixels(image_width * image_height, 0xffff00ff);
+  std::vector<Color> pixels(image_width * image_height, Color(0xffff00ff));
   save_image(pixels, "", image_width, image_height, FileType::png);
   return 0;
 }
