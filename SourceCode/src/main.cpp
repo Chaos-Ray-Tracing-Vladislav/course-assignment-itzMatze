@@ -3,6 +3,7 @@
 #include <vector>
 #include <ctime>
 #include <fstream>
+#include <random>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
@@ -63,9 +64,63 @@ void save_image(std::vector<Color> pixels, const std::string& name, int width, i
   }
 }
 
+Color get_random_color(float random)
+{
+  uint32_t rnd = random * 0x00ffffff;
+  return Color(0xff000000 | rnd);
+}
+
+std::vector<Color> create_random_color_rectangles_image(const int width, const int height, const int rectangle_count_x = 4, const int rectangle_count_y = 4)
+{
+  std::vector<Color> pixels(width * height);
+  std::vector<Color> rectangle_colors(rectangle_count_x * rectangle_count_y);
+  std::mt19937 rnd(42);
+  std::uniform_real_distribution<float> dis(0.0, 1.0);
+  for (auto& color : rectangle_colors) color = get_random_color(dis(rnd));
+  for (uint32_t y = 0; y < height; y++)
+  {
+    for (uint32_t x = 0; x < width; x++)
+    {
+      const uint32_t rectangle_idx_x = (x * rectangle_count_x) / width;
+      const uint32_t rectangle_idx_y = (y * rectangle_count_y) / height;
+      // get color of current rectangle, the color can be modulated by applying a random offset
+      Color color(rectangle_colors[rectangle_idx_y * rectangle_count_x + rectangle_idx_x].value);
+      pixels[y * width + x] = color;
+    }
+  }
+  return pixels;
+}
+
+std::vector<Color> create_fix_color_rectangles_image(const int width, const int height, const int rectangle_count_x = 4, const int rectangle_count_y = 4)
+{
+  std::vector<Color> pixels(width * height);
+  for (uint32_t y = 0; y < height; y++)
+  {
+    for (uint32_t x = 0; x < width; x++)
+    {
+      const uint32_t rectangle_idx_x = (x * rectangle_count_x) / width;
+      const uint32_t rectangle_idx_y = (y * rectangle_count_y) / height;
+      Color color;
+      // define a repeating color pattern
+      if (rectangle_idx_y & 1u)
+      {
+        if (rectangle_idx_x & 1u) color = Color(1.0, 0.0, 0.0);
+        else color = Color(0.0, 1.0, 1.0);
+      }
+      else
+      {
+        if (rectangle_idx_x & 1u) color = Color(0.0, 0.0, 1.0);
+        else color = Color(1.0, 0.0, 1.0);
+      }
+      pixels[y * width + x] = color;
+    }
+  }
+  return pixels;
+}
+
 int main(int argc, char** argv)
 {
-  std::vector<Color> pixels(image_width * image_height, Color(0xffff00ff));
+  std::vector<Color> pixels = create_fix_color_rectangles_image(image_width, image_height, image_width / 100, image_height / 100);
   save_image(pixels, "", image_width, image_height, FileType::png);
   return 0;
 }
