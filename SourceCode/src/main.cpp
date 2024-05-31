@@ -134,8 +134,12 @@ std::vector<Color> create_circle_image(const int width, const int height, const 
 
 int main(int argc, char** argv)
 {
-  std::vector<Color> pixels = create_circle_image(image_width, image_height, 200);
-  save_image(pixels, "", image_width, image_height, FileType::png);
+  std::vector<Color> rnd_rect_pixels = create_random_color_rectangles_image(image_width, image_height, 10, 10);
+  std::vector<Color> fix_rect_pixels = create_fix_color_rectangles_image(image_width, image_height, 10, 10);
+  std::vector<Color> circle_pixels = create_circle_image(image_width, image_height, 200);
+  save_image(rnd_rect_pixels, "rnd_rect", image_width, image_height, FileType::png);
+  save_image(fix_rect_pixels, "fix_rect", image_width, image_height, FileType::png);
+  save_image(circle_pixels, "circle", image_width, image_height, FileType::png);
   return 0;
 }
 
