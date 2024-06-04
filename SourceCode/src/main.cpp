@@ -64,19 +64,13 @@ void save_image(std::vector<Color> pixels, const std::string& name, uint32_t wid
   }
 }
 
-Color get_random_color(float random)
-{
-  uint32_t rnd = random * 0x00ffffff;
-  return Color(0xff000000 | rnd);
-}
-
 std::vector<Color> create_random_color_rectangles_image(const uint32_t width, const uint32_t height, const uint32_t rectangle_count_x = 4, const uint32_t rectangle_count_y = 4)
 {
   std::vector<Color> pixels(width * height);
   std::vector<Color> rectangle_colors(rectangle_count_x * rectangle_count_y);
   std::mt19937 rnd(42);
   std::uniform_real_distribution<float> dis(0.0, 1.0);
-  for (auto& color : rectangle_colors) color = get_random_color(dis(rnd));
+  for (auto& color : rectangle_colors) color = Color::get_random_color(dis(rnd));
   for (uint32_t y = 0; y < height; y++)
   {
     for (uint32_t x = 0; x < width; x++)

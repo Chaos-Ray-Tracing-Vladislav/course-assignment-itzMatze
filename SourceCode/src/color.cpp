@@ -37,3 +37,9 @@ uint32_t Color::get_hex_color() const
   return hex_color;
 }
 
+Color Color::get_random_color(float random)
+{
+  uint32_t rnd = random * 0x00ffffff;
+  return Color(0xff000000 | rnd);
+}
+

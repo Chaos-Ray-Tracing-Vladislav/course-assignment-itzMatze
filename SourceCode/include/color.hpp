@@ -11,6 +11,7 @@ public:
   Color(float r, float g, float b);
   Color(float r, float g, float b, float a);
   uint32_t get_hex_color() const;
+  static Color get_random_color(float random);
 
   Vec3 value;
   float alpha;
