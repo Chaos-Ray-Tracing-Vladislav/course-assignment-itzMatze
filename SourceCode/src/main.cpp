@@ -20,7 +20,7 @@ enum class FileType
 };
 
 // pixel hex values are assumed to be in abgr format
-void save_image(std::vector<Color> pixels, const std::string& name, int width, int height, FileType type = FileType::png)
+void save_image(std::vector<Color> pixels, const std::string& name, uint32_t width, uint32_t height, FileType type = FileType::png)
 {
   std::string image_path("../../Images/" + name);
   if (!name.empty())
@@ -70,7 +70,7 @@ Color get_random_color(float random)
   return Color(0xff000000 | rnd);
 }
 
-std::vector<Color> create_random_color_rectangles_image(const int width, const int height, const int rectangle_count_x = 4, const int rectangle_count_y = 4)
+std::vector<Color> create_random_color_rectangles_image(const uint32_t width, const uint32_t height, const uint32_t rectangle_count_x = 4, const uint32_t rectangle_count_y = 4)
 {
   std::vector<Color> pixels(width * height);
   std::vector<Color> rectangle_colors(rectangle_count_x * rectangle_count_y);
@@ -91,7 +91,7 @@ std::vector<Color> create_random_color_rectangles_image(const int width, const i
   return pixels;
 }
 
-std::vector<Color> create_fix_color_rectangles_image(const int width, const int height, const int rectangle_count_x = 4, const int rectangle_count_y = 4)
+std::vector<Color> create_fix_color_rectangles_image(const uint32_t width, const uint32_t height, const uint32_t rectangle_count_x = 4, const uint32_t rectangle_count_y = 4)
 {
   std::vector<Color> pixels(width * height);
   for (uint32_t y = 0; y < height; y++)
@@ -118,7 +118,8 @@ std::vector<Color> create_fix_color_rectangles_image(const int width, const int 
   return pixels;
 }
 
-std::vector<Color> create_circle_image(const int width, const int height, const int radius = 200)
+// convert width and height to int as negative numbers are needed to compute circle
+std::vector<Color> create_circle_image(const int width, const int height, const uint32_t radius = 200)
 {
   std::vector<Color> pixels(width * height);
   for (uint32_t y = 0; y < height; y++)
