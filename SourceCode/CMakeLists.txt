@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 project(Chaos)
 set(CMAKE_CXX_STANDARD 20)
 
-set(SOURCE_FILES src/color.cpp src/vec.cpp)
+set(SOURCE_FILES src/color.cpp src/vec.cpp src/random_generator.cpp)
 
 add_executable(Chaos src/main.cpp ${SOURCE_FILES})
 
