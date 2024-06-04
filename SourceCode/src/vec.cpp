@@ -1,5 +1,6 @@
 #include "vec.hpp"
 
+namespace cm {
 Vec3::Vec3(float value) : x(value), y(value), z(value)
 {}
 
@@ -20,4 +21,6 @@ Vec3 Vec3::operator/(const float other) const
 {
   return Vec3(x / other, y / other, z / other);
 }
+
+} // namespace cm
 

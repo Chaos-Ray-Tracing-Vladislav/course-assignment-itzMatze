@@ -1,5 +1,7 @@
 #pragma once
 
+// chaos math
+namespace cm {
 class Vec3
 {
 public:
@@ -17,4 +19,6 @@ public:
   float y;
   float z;
 };
+
+} // namespace cm
 
