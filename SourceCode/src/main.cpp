@@ -3,7 +3,7 @@
 #include <vector>
 #include <ctime>
 #include <fstream>
-#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <cmath>
 #include "stb_image_write.h"
 
 #include "color.hpp"
