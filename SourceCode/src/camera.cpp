@@ -16,7 +16,7 @@ Camera::Camera(const cm::Vec2u& resolution, const cm::Vec3& origin, const cm::Ve
   upper_left_corner = origin + (sensor_height / 2.0) * v - (sensor_width / 2.0) * u - focal_length * w;
 }
 
-Ray Camera::get_ray(cm::Vec2u pixel, bool use_jittering)
+Ray Camera::get_ray(const cm::Vec2u& pixel, bool use_jittering)
 {
   // offset to either get a random position inside of the pixel square or the center of the pixel
   cm::Vec2 offset = use_jittering ? cm::Vec2(rng::random_float(), rng::random_float()) : cm::Vec2(0.5);

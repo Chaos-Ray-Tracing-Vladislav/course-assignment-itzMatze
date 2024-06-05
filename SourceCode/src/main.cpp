@@ -17,7 +17,7 @@ enum class FileType
   png
 };
 
-void save_image(std::vector<Color> pixels, const std::string& name, uint32_t width, uint32_t height, FileType type = FileType::png)
+void save_image(const std::vector<Color>& pixels, const std::string& name, uint32_t width, uint32_t height, FileType type = FileType::png)
 {
   std::string image_path("../../Images/" + name);
   if (!name.empty())
