@@ -17,7 +17,6 @@ enum class FileType
   png
 };
 
-// pixel hex values are assumed to be in abgr format
 void save_image(std::vector<Color> pixels, const std::string& name, uint32_t width, uint32_t height, FileType type = FileType::png)
 {
   std::string image_path("../../Images/" + name);
@@ -64,12 +63,16 @@ void save_image(std::vector<Color> pixels, const std::string& name, uint32_t wid
 
 int main(int argc, char** argv)
 {
+#if 0
   std::vector<Color> rnd_rect_pixels = create_random_color_rectangles_image(image_width, image_height, 10, 10);
-  std::vector<Color> fix_rect_pixels = create_fix_color_rectangles_image(image_width, image_height, 10, 10);
-  std::vector<Color> circle_pixels = create_circle_image(image_width, image_height, 200);
   save_image(rnd_rect_pixels, "rnd_rect", image_width, image_height, FileType::png);
+  std::vector<Color> fix_rect_pixels = create_fix_color_rectangles_image(image_width, image_height, 10, 10);
   save_image(fix_rect_pixels, "fix_rect", image_width, image_height, FileType::png);
+  std::vector<Color> circle_pixels = create_circle_image(image_width, image_height, 200);
   save_image(circle_pixels, "circle", image_width, image_height, FileType::png);
+#endif
+  std::vector<Color> cam_ray_vis_pixels = create_camera_ray_vis_image(image_width, image_height);
+  save_image(cam_ray_vis_pixels, "cam_ray_vis", image_width, image_height, FileType::png);
   return 0;
 }
 

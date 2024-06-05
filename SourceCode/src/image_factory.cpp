@@ -1,5 +1,6 @@
 #include "image_factory.hpp"
 #include <cmath>
+#include "camera.hpp"
 
 std::vector<Color> create_random_color_rectangles_image(const uint32_t width, const uint32_t height, const uint32_t rectangle_count_x, const uint32_t rectangle_count_y)
 {
@@ -61,3 +62,18 @@ std::vector<Color> create_circle_image(const int width, const int height, const 
   }
   return pixels;
 }
+
+std::vector<Color> create_camera_ray_vis_image(const uint32_t width, const uint32_t height)
+{
+  std::vector<Color> pixels(width * height);
+  Camera cam(width, height);
+  for (uint32_t y = 0; y < height; y++)
+  {
+    for (uint32_t x = 0; x < width; x++)
+    {
+      pixels[y * width + x] = Color((cam.get_ray({x, y}).dir + 1.0) / 2.0);
+    }
+  }
+  return pixels;
+}
+
