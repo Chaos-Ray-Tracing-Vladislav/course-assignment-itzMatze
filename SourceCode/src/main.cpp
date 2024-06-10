@@ -3,12 +3,10 @@
 #include <vector>
 #include <ctime>
 #include <fstream>
-#include <random>
-#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
 #include "color.hpp"
-#include "vec.hpp"
+#include "image_factory.hpp"
 
 constexpr uint32_t image_width = 1920;
 constexpr uint32_t image_height = 1080;
@@ -19,8 +17,7 @@ enum class FileType
   png
 };
 
-// pixel hex values are assumed to be in abgr format
-void save_image(std::vector<Color> pixels, const std::string& name, uint32_t width, uint32_t height, FileType type = FileType::png)
+void save_image(const std::vector<Color>& pixels, const std::string& name, uint32_t width, uint32_t height, FileType type = FileType::png)
 {
   std::string image_path("../../Images/" + name);
   if (!name.empty())
@@ -64,83 +61,18 @@ void save_image(std::vector<Color> pixels, const std::string& name, uint32_t wid
   }
 }
 
-Color get_random_color(float random)
-{
-  uint32_t rnd = random * 0x00ffffff;
-  return Color(0xff000000 | rnd);
-}
-
-std::vector<Color> create_random_color_rectangles_image(const uint32_t width, const uint32_t height, const uint32_t rectangle_count_x = 4, const uint32_t rectangle_count_y = 4)
-{
-  std::vector<Color> pixels(width * height);
-  std::vector<Color> rectangle_colors(rectangle_count_x * rectangle_count_y);
-  std::mt19937 rnd(42);
-  std::uniform_real_distribution<float> dis(0.0, 1.0);
-  for (auto& color : rectangle_colors) color = get_random_color(dis(rnd));
-  for (uint32_t y = 0; y < height; y++)
-  {
-    for (uint32_t x = 0; x < width; x++)
-    {
-      const uint32_t rectangle_idx_x = (x * rectangle_count_x) / width;
-      const uint32_t rectangle_idx_y = (y * rectangle_count_y) / height;
-      // get color of current rectangle, the color can be modulated by applying a random offset
-      Color color(rectangle_colors[rectangle_idx_y * rectangle_count_x + rectangle_idx_x].value);
-      pixels[y * width + x] = color;
-    }
-  }
-  return pixels;
-}
-
-std::vector<Color> create_fix_color_rectangles_image(const uint32_t width, const uint32_t height, const uint32_t rectangle_count_x = 4, const uint32_t rectangle_count_y = 4)
-{
-  std::vector<Color> pixels(width * height);
-  for (uint32_t y = 0; y < height; y++)
-  {
-    for (uint32_t x = 0; x < width; x++)
-    {
-      const uint32_t rectangle_idx_x = (x * rectangle_count_x) / width;
-      const uint32_t rectangle_idx_y = (y * rectangle_count_y) / height;
-      Color color;
-      // define a repeating color pattern
-      if (rectangle_idx_y & 1u)
-      {
-        if (rectangle_idx_x & 1u) color = Color(1.0, 0.0, 0.0);
-        else color = Color(0.0, 1.0, 1.0);
-      }
-      else
-      {
-        if (rectangle_idx_x & 1u) color = Color(0.0, 0.0, 1.0);
-        else color = Color(1.0, 0.0, 1.0);
-      }
-      pixels[y * width + x] = color;
-    }
-  }
-  return pixels;
-}
-
-// convert width and height to int as negative numbers are needed to compute circle
-std::vector<Color> create_circle_image(const int width, const int height, const uint32_t radius = 200)
-{
-  std::vector<Color> pixels(width * height);
-  for (uint32_t y = 0; y < height; y++)
-  {
-    for (uint32_t x = 0; x < width; x++)
-    {
-      const bool isInsideCircle = (std::pow(int(x) - width / 2, 2) + std::pow(int(y) - height / 2, 2) < (radius * radius));
-      pixels[y * width + x] = isInsideCircle ? Color(0.0, 1.0, 1.0) : Color(0.0, 0.0, 0.0);
-    }
-  }
-  return pixels;
-}
-
 int main(int argc, char** argv)
 {
+#if 0
   std::vector<Color> rnd_rect_pixels = create_random_color_rectangles_image(image_width, image_height, 10, 10);
-  std::vector<Color> fix_rect_pixels = create_fix_color_rectangles_image(image_width, image_height, 10, 10);
-  std::vector<Color> circle_pixels = create_circle_image(image_width, image_height, 200);
   save_image(rnd_rect_pixels, "rnd_rect", image_width, image_height, FileType::png);
+  std::vector<Color> fix_rect_pixels = create_fix_color_rectangles_image(image_width, image_height, 10, 10);
   save_image(fix_rect_pixels, "fix_rect", image_width, image_height, FileType::png);
+  std::vector<Color> circle_pixels = create_circle_image(image_width, image_height, 200);
   save_image(circle_pixels, "circle", image_width, image_height, FileType::png);
+#endif
+  std::vector<Color> cam_ray_vis_pixels = create_camera_ray_vis_image(image_width, image_height);
+  save_image(cam_ray_vis_pixels, "cam_ray_vis", image_width, image_height, FileType::png);
   return 0;
 }
 

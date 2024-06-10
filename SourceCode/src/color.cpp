@@ -1,5 +1,6 @@
 #include "color.hpp"
 #include <algorithm>
+#include "random_generator.hpp"
 
 Color::Color() : value(0.0), alpha(0.0)
 {}
@@ -15,7 +16,7 @@ Color::Color(uint32_t hex_color)
   alpha = float(hex_color) / 255.0f;
 }
 
-Color::Color(Vec3 rgb) : value(rgb), alpha(1.0)
+Color::Color(const cm::Vec3& rgb) : value(rgb), alpha(1.0)
 {}
 
 Color::Color(float r, float g, float b) : value(r, g, b), alpha(1.0)
@@ -35,5 +36,11 @@ uint32_t Color::get_hex_color() const
   hex_color <<= 8;
   hex_color += std::clamp(static_cast<uint64_t>(value.x * 255.999f), uint64_t(0), uint64_t(255));
   return hex_color;
+}
+
+Color Color::get_random_color()
+{
+  uint32_t rnd = rng::random_float() * 0x00ffffff;
+  return Color(0xff000000 | rnd);
 }
 
