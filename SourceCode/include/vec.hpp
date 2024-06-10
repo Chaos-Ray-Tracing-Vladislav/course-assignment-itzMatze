@@ -138,11 +138,11 @@ struct Vec<T, 3>
   };
 };
 
-typedef Vec<float, 2> Vec2;
-typedef Vec<float, 3> Vec3;
-typedef Vec<int32_t, 2> Vec2i;
-typedef Vec<int32_t, 3> Vec3i;
-typedef Vec<uint32_t, 2> Vec2u;
-typedef Vec<uint32_t, 3> Vec3u;
+using Vec2 = Vec<float, 2>;
+using Vec3 = Vec<float, 3>;
+using Vec2i = Vec<int32_t, 2>;
+using Vec3i = Vec<int32_t, 3>;
+using Vec2u = Vec<uint32_t, 2>;
+using Vec3u = Vec<uint32_t, 3>;
 } // namespace cm
 
