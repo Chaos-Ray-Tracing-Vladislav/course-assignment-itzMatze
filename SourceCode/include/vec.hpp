@@ -11,11 +11,11 @@ class Vec
 {
 public:
   Vec() = default;
-  explicit Vec(const T value)
+  constexpr explicit Vec(const T value)
   {
     for (uint32_t i = 0; i < N; i++) values[i] = value;
   }
-  Vec(const T vals[N])
+  constexpr explicit Vec(const T vals[N])
   {
     for (uint32_t i = 0; i < N; i++) values[i] = vals[i];
   }
@@ -118,11 +118,11 @@ Vec<T, 3> cross(const Vec<T, 3>& a, const Vec<T, 3>& b) requires(std::is_floatin
 template<typename T>
 struct Vec<T, 2>
 {
-  Vec() = default;
-  Vec(const T value) : x(value), y(value) {}
-  Vec(const T x, const T y) : x(x), y(y) {}
-  Vec(const Vec& other) : x(other.x), y(other.y) {}
-  Vec(const T vals[2]) : x(vals[0]), y(vals[1]) {}
+  constexpr Vec() = default;
+  constexpr explicit Vec(const T value) : x(value), y(value) {}
+  constexpr Vec(const T x, const T y) : x(x), y(y) {}
+  constexpr Vec(const Vec& other) : x(other.x), y(other.y) {}
+  constexpr Vec(const T vals[2]) : x(vals[0]), y(vals[1]) {}
   union {
     T values[2];
     struct {
@@ -141,11 +141,11 @@ std::ostream& operator<<(std::ostream& out, const Vec<T, 2>& a)
 template<typename T>
 struct Vec<T, 3>
 {
-  Vec() = default;
-  Vec(const T value) : x(value), y(value), z(value) {}
-  Vec(const T x, const T y, const T z) : x(x), y(y), z(z) {}
-  Vec(const Vec& other) : x(other.x), y(other.y), z(other.z) {}
-  Vec(const T vals[3]) : x(vals[0]), y(vals[1]), z(vals[2]) {}
+  constexpr Vec() = default;
+  constexpr explicit Vec(const T value) : x(value), y(value), z(value) {}
+  constexpr Vec(const T x, const T y, const T z) : x(x), y(y), z(z) {}
+  constexpr Vec(const Vec& other) : x(other.x), y(other.y), z(other.z) {}
+  constexpr Vec(const T vals[3]) : x(vals[0]), y(vals[1]), z(vals[2]) {}
   union {
     T values[3];
     struct {

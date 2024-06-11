@@ -5,11 +5,11 @@
 #include <fstream>
 #include "stb_image_write.h"
 
+#include "vec.hpp"
 #include "color.hpp"
 #include "image_factory.hpp"
 
-constexpr uint32_t image_width = 1920;
-constexpr uint32_t image_height = 1080;
+static constexpr cm::Vec2u resolution(1920, 1080);
 
 enum class FileType
 {
@@ -17,7 +17,7 @@ enum class FileType
   png
 };
 
-void save_image(const std::vector<Color>& pixels, const std::string& name, uint32_t width, uint32_t height, FileType type = FileType::png)
+void save_image(const std::vector<Color>& pixels, const std::string& name, const cm::Vec2u resolution, FileType type = FileType::png)
 {
   std::string image_path("../../Images/" + name);
   if (!name.empty())
@@ -36,19 +36,19 @@ void save_image(const std::vector<Color>& pixels, const std::string& name, uint3
     image_path.append(".png");
     std::vector<uint32_t> hex_pixels;
     for (const auto& color : pixels) hex_pixels.emplace_back(color.get_hex_color());
-    stbi_write_png(image_path.c_str(), width, height, 4, hex_pixels.data(), width * 4);
+    stbi_write_png(image_path.c_str(), resolution.x, resolution.y, 4, hex_pixels.data(), resolution.x * 4);
   }
   else if (type == FileType::ppm)
   {
     image_path.append(".ppm");
     std::ofstream file(image_path, std::ios::out | std::ios::binary);
-    file << "P3\n" << width << " " << height << "\n" << 255 << "\n";
-    for (uint32_t y = 0; y < height; y++)
+    file << "P3\n" << resolution.x << " " << resolution.y << "\n" << 255 << "\n";
+    for (uint32_t y = 0; y < resolution.y; y++)
     {
-      for (uint32_t x = 0; x < width; x++)
+      for (uint32_t x = 0; x < resolution.x; x++)
       {
         // extract rgb values from hex representation and print to the file
-        uint32_t pixel = pixels[y * width + x].get_hex_color();
+        uint32_t pixel = pixels[y * resolution.x + x].get_hex_color();
         file << (pixel & 0x000000ff) << " ";
         pixel >>= 8;
         file << (pixel & 0x000000ff) << " ";
@@ -64,15 +64,15 @@ void save_image(const std::vector<Color>& pixels, const std::string& name, uint3
 int main(int argc, char** argv)
 {
 #if 0
-  std::vector<Color> rnd_rect_pixels = create_random_color_rectangles_image(image_width, image_height, 10, 10);
-  save_image(rnd_rect_pixels, "rnd_rect", image_width, image_height, FileType::png);
-  std::vector<Color> fix_rect_pixels = create_fix_color_rectangles_image(image_width, image_height, 10, 10);
-  save_image(fix_rect_pixels, "fix_rect", image_width, image_height, FileType::png);
-  std::vector<Color> circle_pixels = create_circle_image(image_width, image_height, 200);
-  save_image(circle_pixels, "circle", image_width, image_height, FileType::png);
+  std::vector<Color> rnd_rect_pixels = create_random_color_rectangles_image(resolution, 10, 10);
+  save_image(rnd_rect_pixels, "rnd_rect", resolution, FileType::png);
+  std::vector<Color> fix_rect_pixels = create_fix_color_rectangles_image(resolution, 10, 10);
+  save_image(fix_rect_pixels, "fix_rect", resolution, FileType::png);
+  std::vector<Color> circle_pixels = create_circle_image(resolution, 200);
+  save_image(circle_pixels, "circle", resolution, FileType::png);
 #endif
-  std::vector<Color> cam_ray_vis_pixels = create_camera_ray_vis_image(image_width, image_height);
-  save_image(cam_ray_vis_pixels, "cam_ray_vis", image_width, image_height, FileType::png);
+  std::vector<Color> cam_ray_vis_pixels = create_camera_ray_vis_image(resolution);
+  save_image(cam_ray_vis_pixels, "cam_ray_vis", resolution, FileType::png);
   return 0;
 }
 
