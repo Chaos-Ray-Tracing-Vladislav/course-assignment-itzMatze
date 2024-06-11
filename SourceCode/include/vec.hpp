@@ -84,6 +84,14 @@ Vec<T1, N> operator*(const T2 a, const Vec<T1, N>& b)
 }
 
 template<typename T, int N>
+float dot(const Vec<T, N>& a, const cm::Vec<T, N>& b)
+{
+  float result = 0.0;
+  for (uint32_t i = 0; i < N; i++) result += a.values[i] * b.values[i];
+  return result;
+}
+
+template<typename T, int N>
 float length(const Vec<T, N>& a)
 {
   float result = 0.0;
