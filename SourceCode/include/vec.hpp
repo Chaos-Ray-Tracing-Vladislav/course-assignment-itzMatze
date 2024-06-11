@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <cmath>
+#include <ostream>
 #include <type_traits>
 
 // chaos math
@@ -123,6 +124,13 @@ struct Vec<T, 2>
 };
 
 template<typename T>
+std::ostream& operator<<(std::ostream& out, const Vec<T, 2>& a)
+{
+  out << "(" << a.x << ", " << a.y << ")";
+  return out;
+}
+
+template<typename T>
 struct Vec<T, 3>
 {
   Vec() = default;
@@ -137,6 +145,13 @@ struct Vec<T, 3>
     };
   };
 };
+
+template<typename T>
+std::ostream& operator<<(std::ostream& out, const Vec<T, 3>& a)
+{
+  out << "(" << a.x << ", " << a.y << ", " << a.z << ")";
+  return out;
+}
 
 using Vec2 = Vec<float, 2>;
 using Vec3 = Vec<float, 3>;
