@@ -10,6 +10,11 @@ void Scene::add_triangle(const Triangle& triangle)
   triangles.emplace_back(triangle);
 }
 
+void Scene::add_triangles(const std::vector<Triangle>& new_triangles)
+{
+  triangles.insert(triangles.begin(), new_triangles.begin(), new_triangles.end());
+}
+
 const std::vector<Triangle>& Scene::get_triangles() const
 {
   return triangles;

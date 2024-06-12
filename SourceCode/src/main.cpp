@@ -76,13 +76,16 @@ int main(int argc, char** argv)
   save_image(pixels, "circle", resolution, FileType::png);
   pixels = create_camera_ray_vis_image(resolution);
   save_image(pixels, "cam_ray_vis", resolution, FileType::png);
-#endif
   renderer.init(create_single_triangle_scene(), resolution);
   pixels = renderer.trace();
   save_image(pixels, "single_triangle", resolution);
   renderer.init(create_triple_triangle_scene(), resolution);
   pixels = renderer.trace();
   save_image(pixels, "triple_triangle", resolution);
+#endif
+  renderer.init(create_pyramid_star_scene(), resolution);
+  pixels = renderer.trace();
+  save_image(pixels, "pyramid_star", resolution);
   return 0;
 }
 

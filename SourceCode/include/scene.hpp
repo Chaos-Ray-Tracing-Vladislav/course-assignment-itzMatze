@@ -10,6 +10,7 @@ public:
   Scene() = default;
   Scene(const std::vector<Triangle>& triangles);
   void add_triangle(const Triangle& triangle);
+  void add_triangles(const std::vector<Triangle>& triangles);
   const std::vector<Triangle>& get_triangles() const;
   bool intersect(const Ray& ray, float& t, cm::Vec3& p) const;
 
