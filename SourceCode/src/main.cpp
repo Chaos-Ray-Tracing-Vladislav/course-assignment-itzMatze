@@ -8,6 +8,8 @@
 #include "vec.hpp"
 #include "color.hpp"
 #include "image_factory.hpp"
+#include "scene_factory.hpp"
+#include "renderer.hpp"
 
 static constexpr cm::Vec2u resolution(1920, 1080);
 
@@ -63,16 +65,27 @@ void save_image(const std::vector<Color>& pixels, const std::string& name, const
 
 int main(int argc, char** argv)
 {
+  std::vector<Color> pixels;
+  Renderer renderer;
 #if 0
-  std::vector<Color> rnd_rect_pixels = create_random_color_rectangles_image(resolution, 10, 10);
-  save_image(rnd_rect_pixels, "rnd_rect", resolution, FileType::png);
-  std::vector<Color> fix_rect_pixels = create_fix_color_rectangles_image(resolution, 10, 10);
-  save_image(fix_rect_pixels, "fix_rect", resolution, FileType::png);
-  std::vector<Color> circle_pixels = create_circle_image(resolution, 200);
-  save_image(circle_pixels, "circle", resolution, FileType::png);
+  pixels = create_random_color_rectangles_image(resolution, 10, 10);
+  save_image(pixels, "rnd_rect", resolution, FileType::png);
+  pixels = create_fix_color_rectangles_image(resolution, 10, 10);
+  save_image(pixels, "fix_rect", resolution, FileType::png);
+  pixels = create_circle_image(resolution, 200);
+  save_image(pixels, "circle", resolution, FileType::png);
+  pixels = create_camera_ray_vis_image(resolution);
+  save_image(pixels, "cam_ray_vis", resolution, FileType::png);
+  renderer.init(create_single_triangle_scene(), resolution);
+  pixels = renderer.trace();
+  save_image(pixels, "single_triangle", resolution);
+  renderer.init(create_triple_triangle_scene(), resolution);
+  pixels = renderer.trace();
+  save_image(pixels, "triple_triangle", resolution);
 #endif
-  std::vector<Color> cam_ray_vis_pixels = create_camera_ray_vis_image(resolution);
-  save_image(cam_ray_vis_pixels, "cam_ray_vis", resolution, FileType::png);
+  renderer.init(create_pyramid_star_scene(), resolution);
+  pixels = renderer.trace();
+  save_image(pixels, "pyramid_star", resolution);
   return 0;
 }
 
