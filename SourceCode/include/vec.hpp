@@ -55,12 +55,12 @@ struct Vec
 
 // only the operators that are needed are implemented
 // so, not every expected overload might be there already
-template<typename T, int N>
-Vec<T, N> operator+(const Vec<T, N>& a, const Vec<T, N>& b)
+template<typename T1, typename T2, int N>
+Vec<T1, N> operator+(const Vec<T1, N>& a, const Vec<T2, N>& b)
 {
-  T vals[N];
-  for (uint32_t i = 0; i < N; i++) vals[i] = a.values[i] + b.values[i];
-  return Vec<T, N>(vals);
+  T1 vals[N];
+  for (uint32_t i = 0; i < N; i++) vals[i] = a.values[i] + T1(b.values[i]);
+  return Vec<T1, N>(vals);
 }
 
 template<typename T1, typename T2, int N>
@@ -89,6 +89,14 @@ Vec<T, N> operator-(const Vec<T, N>& a)
   T vals[N];
   for (uint32_t i = 0; i < N; i++) vals[i] = -a.values[i];
   return Vec<T, N>(vals);
+}
+
+template<typename T1, typename T2, int N>
+Vec<T1, N> operator/(const Vec<T1, N>& a, const Vec<T2, N>& b)
+{
+  T1 vals[N];
+  for (uint32_t i = 0; i < N; i++) vals[i] = a.values[i] / T1(b.values[i]);
+  return Vec<T1, N>(vals);
 }
 
 template<typename T1, typename T2, int N>
