@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 {
   std::vector<Color> pixels;
   Renderer renderer;
-  renderer.init(hw06_task02(), resolution, "hw06_task02");
+  renderer.init(create_pyramid_star_scene(), resolution, "pyramid_star");
   renderer.render();
   cm::Mat3 mat({{1.0f, 2.0f, 3.0f}, {1.0f, 2.0f, 3.0f}, {1.0f, 2.0f, 3.0f}});
   cm::Vec3 angles = {90.0, 0.0, 0.0};

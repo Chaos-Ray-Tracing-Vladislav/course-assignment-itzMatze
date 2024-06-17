@@ -1,3 +1,5 @@
+#include "vec.hpp"
+#include "mat.hpp"
 #include "scene.hpp"
 #include "scene_builder.hpp"
 
@@ -85,6 +87,27 @@ Scene create_pyramid_star_scene()
 
   // star
   scene_builder.get_geometry().add_triangles(add_star(cm::Vec3(0.0, 0.5, -4.0), 0.1, 0.5, 5));
+
+  scene_builder.new_keyframe(30);
+  scene_builder.get_camera().set_origin(cm::Vec3(-4.0, 0.0, 1.0));
+  scene_builder.get_camera().set_view_dir(cm::Vec3(0.0, 0.0, -6.0) - scene_builder.get_camera().get_origin());
+
+  scene_builder.new_keyframe(30);
+  scene_builder.get_camera().set_origin(cm::Vec3(-4.0, 4.0, 1.0));
+
+  scene_builder.new_keyframe(30);
+  scene_builder.get_camera().set_view_dir(cm::Vec3(0.0, 0.0, -6.0) - scene_builder.get_camera().get_origin());
+
+  scene_builder.new_keyframe(30);
+  scene_builder.get_camera().set_origin(cm::Vec3(0.0, 0.0, 0.0));
+  scene_builder.get_camera().set_view_dir(cm::Vec3(0.0, 0.0, -1.0));
+
+  scene_builder.new_keyframe(15);
+  scene_builder.get_camera().set_view_dir(cm::rotate(cm::Vec3(0.0, 30.0, 0.0)) * scene_builder.get_camera().get_view_dir());
+  scene_builder.new_keyframe(30);
+  scene_builder.get_camera().set_view_dir(cm::rotate(cm::Vec3(0.0, -60.0, 0.0)) * scene_builder.get_camera().get_view_dir());
+  scene_builder.new_keyframe(15);
+  scene_builder.get_camera().set_view_dir(cm::rotate(cm::Vec3(0.0, 30.0, 0.0)) * scene_builder.get_camera().get_view_dir());
 
   return scene_builder.build_scene();
 }
