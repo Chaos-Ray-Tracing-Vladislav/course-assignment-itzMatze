@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <cassert>
 #include <cmath>
 #include <ostream>
 #include <iomanip>
@@ -8,10 +9,9 @@
 // chaos math
 namespace cm {
 template<typename T, int N>
-class Vec
+struct Vec
 {
-public:
-  Vec() = default;
+  constexpr Vec() = default;
   constexpr explicit Vec(const T value)
   {
     for (uint32_t i = 0; i < N; i++) values[i] = value;
@@ -19,6 +19,15 @@ public:
   constexpr explicit Vec(const T vals[N])
   {
     for (uint32_t i = 0; i < N; i++) values[i] = vals[i];
+  }
+  constexpr Vec(const std::initializer_list<T>& vals)
+  {
+    assert(vals.size() == N);
+    uint32_t i = 0;
+    for (const auto& val : vals)
+    {
+      values[i++] = val;
+    }
   }
 
   T values[N];
@@ -124,6 +133,16 @@ struct Vec<T, 2>
   constexpr Vec(const T x, const T y) : x(x), y(y) {}
   constexpr Vec(const Vec& other) : x(other.x), y(other.y) {}
   constexpr Vec(const T vals[2]) : x(vals[0]), y(vals[1]) {}
+  constexpr Vec(const std::initializer_list<T>& vals)
+  {
+    assert(vals.size() == 2);
+    uint32_t i = 0;
+    for (const auto& val : vals)
+    {
+      values[i++] = val;
+    }
+  }
+
   union {
     T values[2];
     struct {
@@ -147,6 +166,16 @@ struct Vec<T, 3>
   constexpr Vec(const T x, const T y, const T z) : x(x), y(y), z(z) {}
   constexpr Vec(const Vec& other) : x(other.x), y(other.y), z(other.z) {}
   constexpr Vec(const T vals[3]) : x(vals[0]), y(vals[1]), z(vals[2]) {}
+  constexpr Vec(const std::initializer_list<T>& vals)
+  {
+    assert(vals.size() == 3);
+    uint32_t i = 0;
+    for (const auto& val : vals)
+    {
+      values[i++] = val;
+    }
+  }
+
   union {
     T values[3];
     struct {
