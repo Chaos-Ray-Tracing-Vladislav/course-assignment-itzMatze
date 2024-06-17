@@ -4,7 +4,7 @@
 #include <filesystem>
 #include "stb_image_write.h"
 
-void write_image(const std::vector<Color>& pixels, std::string& image_path, const cm::Vec2u resolution, FileType type)
+void write_image(const std::vector<Color>& pixels, std::string image_path, const cm::Vec2u resolution, FileType type)
 {
   if (type == FileType::png)
   {
@@ -53,14 +53,14 @@ void save_single_image(const std::vector<Color>& pixels, const std::string& name
   write_image(pixels, image_path, resolution, type);
 }
 
-ImageSeries::ImageSeries(const std::string& directory, const cm::Vec2u resolution, FileType type) : dir(directory), resolution(resolution), type(type), image_idx(0)
+ImageSeries::ImageSeries(const std::string& directory, const cm::Vec2u resolution, FileType type) : dir("../../Images/" + directory), resolution(resolution), type(type), image_idx(0)
 {
-  if (!std::filesystem::exists(directory)) std::filesystem::create_directory(directory);
+  if (!std::filesystem::exists(dir)) std::filesystem::create_directory(dir);
 }
 
 void ImageSeries::save_image(const std::vector<Color>& pixels)
 {
-  std::string path = dir + std::to_string(image_idx++);
-  write_image(pixels, path, resolution, type);
+  std::filesystem::path path(dir / std::to_string(image_idx++));
+  write_image(pixels, path.string(), resolution, type);
 }
 
