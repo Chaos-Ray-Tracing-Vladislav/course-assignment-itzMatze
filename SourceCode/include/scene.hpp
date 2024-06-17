@@ -1,20 +1,27 @@
 #pragma once
+#include <cstdint>
+#include <memory>
 #include <vector>
-#include "triangle.hpp"
-#include "ray.hpp"
-#include "vec.hpp"
+#include "geometry.hpp"
+#include "camera.hpp"
 
 class Scene
 {
 public:
   Scene() = default;
-  Scene(const std::vector<Triangle>& triangles);
-  void add_triangle(const Triangle& triangle);
-  void add_triangles(const std::vector<Triangle>& triangles);
-  const std::vector<Triangle>& get_triangles() const;
-  bool intersect(const Ray& ray, float& t, cm::Vec3& p) const;
+  Scene(const std::vector<std::shared_ptr<Geometry>>& geometry_keyframes, const std::vector<std::shared_ptr<CameraConfig>>& camera_keyframes, const std::vector<uint32_t>& frame_counts);
+  const Geometry& get_geometry() const;
+  const Camera& get_camera() const;
+  bool step();
+  bool is_animated();
 
 private:
-  std::vector<Triangle> triangles;
+  std::vector<std::shared_ptr<Geometry>> geometry_keyframes;
+  std::vector<std::shared_ptr<CameraConfig>> camera_keyframes;
+  std::vector<uint32_t> frame_counts;
+  Geometry current_geometry;
+  Camera current_camera;
+  uint32_t current_keyframe;
+  uint32_t current_frame_step;
 };
 
