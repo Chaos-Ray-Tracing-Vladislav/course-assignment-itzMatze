@@ -30,6 +30,26 @@ struct Vec
     }
   }
 
+  template<typename T2>
+  T& operator[](const T2 idx) requires(std::is_integral<T2>::value)
+  {
+    return values[idx];
+  }
+
+  template<typename T2>
+  T operator[](const T2 idx) const requires(std::is_integral<T2>::value)
+  {
+    return values[idx];
+  }
+
+  template<typename T2>
+  operator Vec<T2, N>() const
+  {
+    Vec<T2, N> result;
+    for (uint32_t i = 0; i < N; i++) result[i] = T2(values[i]);
+    return result;
+  }
+
   T values[N];
 };
 
@@ -143,6 +163,26 @@ struct Vec<T, 2>
     }
   }
 
+  template<typename T2>
+  T& operator[](const T2 idx) requires(std::is_integral<T2>::value)
+  {
+    return values[idx];
+  }
+
+  template<typename T2>
+  T operator[](const T2 idx) const requires(std::is_integral<T2>::value)
+  {
+    return values[idx];
+  }
+
+  template<typename T2>
+  operator Vec<T2, 2>() const
+  {
+    Vec<T2, 2> result;
+    for (uint32_t i = 0; i < 2; i++) result[i] = T2(values[i]);
+    return result;
+  }
+
   union {
     T values[2];
     struct {
@@ -174,6 +214,26 @@ struct Vec<T, 3>
     {
       values[i++] = val;
     }
+  }
+
+  template<typename T2>
+  T& operator[](const T2 idx) requires(std::is_integral<T2>::value)
+  {
+    return values[idx];
+  }
+
+  template<typename T2>
+  T operator[](const T2 idx) const requires(std::is_integral<T2>::value)
+  {
+    return values[idx];
+  }
+
+  template<typename T2>
+  operator Vec<T2, 3>() const
+  {
+    Vec<T2, 3> result;
+    for (uint32_t i = 0; i < 3; i++) result[i] = T2(values[i]);
+    return result;
   }
 
   union {
