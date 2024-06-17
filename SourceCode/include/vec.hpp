@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cmath>
 #include <ostream>
+#include <iomanip>
 #include <type_traits>
 
 // chaos math
@@ -134,7 +135,7 @@ struct Vec<T, 2>
 template<typename T>
 std::ostream& operator<<(std::ostream& out, const Vec<T, 2>& a)
 {
-  out << "(" << a.x << ", " << a.y << ")";
+  out << std::fixed << "(" << a.x << ", " << a.y << ")";
   return out;
 }
 
@@ -157,7 +158,7 @@ struct Vec<T, 3>
 template<typename T>
 std::ostream& operator<<(std::ostream& out, const Vec<T, 3>& a)
 {
-  out << "(" << a.x << ", " << a.y << ", " << a.z << ")";
+  out << std::fixed << "(" << a.x << ", " << a.y << ", " << a.z << ")";
   return out;
 }
 
