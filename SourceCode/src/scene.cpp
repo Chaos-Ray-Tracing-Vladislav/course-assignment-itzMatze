@@ -1,40 +1,47 @@
 #include "scene.hpp"
-#include <limits>
-#include <vector>
-#include "triangle.hpp"
+#include <cassert>
 
-Scene::Scene(const std::vector<Triangle>& triangles) : triangles(triangles) {}
-
-void Scene::add_triangle(const Triangle& triangle)
+Scene::Scene(const std::vector<std::shared_ptr<Geometry>>& geometry_keyframes, const std::vector<std::shared_ptr<CameraConfig>>& camera_keyframes, const std::vector<uint32_t>& frame_counts) : geometry_keyframes(geometry_keyframes), camera_keyframes(camera_keyframes), frame_counts(frame_counts), current_keyframe(0), current_frame_step(0)
 {
-  triangles.emplace_back(triangle);
+  assert(geometry_keyframes.size() == camera_keyframes.size() && geometry_keyframes.size() == (frame_counts.size() + 1));
+  assert(geometry_keyframes.size() > 0 && camera_keyframes.size() > 0);
+  current_geometry = *geometry_keyframes[0];
+  current_camera = Camera(*camera_keyframes[0]);
 }
 
-void Scene::add_triangles(const std::vector<Triangle>& new_triangles)
+const Geometry& Scene::get_geometry() const
 {
-  triangles.insert(triangles.begin(), new_triangles.begin(), new_triangles.end());
+  return current_geometry;
 }
 
-const std::vector<Triangle>& Scene::get_triangles() const
+const Camera& Scene::get_camera() const
 {
-  return triangles;
+  return current_camera;
 }
 
-bool Scene::intersect(const Ray& ray, float& t, cm::Vec3& p) const
+bool Scene::step()
 {
-  t = std::numeric_limits<float>::max();
-  float cur_t;
-  cm::Vec3 cur_p;
-  for (const auto& triangle : triangles)
+  // if no keyframe is left return false
+  if (current_keyframe >= frame_counts.size()) return false;
+  uint32_t frame_count = frame_counts[current_keyframe];
+
+  // interpolation weight between current and next keyframe
+  float weight = float(current_frame_step) / float(frame_count);
+  current_geometry = interpolate(*geometry_keyframes[current_keyframe], *geometry_keyframes[current_keyframe + 1], weight);
+  CameraConfig interpolated_cam = interpolate(*camera_keyframes[current_keyframe], *camera_keyframes[current_keyframe + 1], weight);
+  current_camera = Camera(interpolated_cam);
+
+  // if all frames between the current and the next keyframe are rendered, move to the next keyframe
+  if (++current_frame_step > frame_count)
   {
-    // test if triangle is intersected and if yes whether the intersection is closer than the previous ones
-    if (triangle.intersect(ray, cur_t, cur_p) && (cur_t < t))
-    {
-      t = cur_t;
-      p = cur_p;
-    }
+    current_keyframe++;
+    current_frame_step = 1;
   }
-  // if an intersection was found, t is the distance to this intersection instead of maximum float value
-  return (t < std::numeric_limits<float>::max());
+  return true;
+}
+
+bool Scene::is_animated()
+{
+  return frame_counts.size() > 0;
 }
 

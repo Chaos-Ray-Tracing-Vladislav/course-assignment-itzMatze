@@ -1,16 +1,17 @@
 #pragma once
 #include <cstdint>
+#include <cassert>
 #include <cmath>
 #include <ostream>
+#include <iomanip>
 #include <type_traits>
 
 // chaos math
 namespace cm {
 template<typename T, int N>
-class Vec
+struct Vec
 {
-public:
-  Vec() = default;
+  constexpr Vec() = default;
   constexpr explicit Vec(const T value)
   {
     for (uint32_t i = 0; i < N; i++) values[i] = value;
@@ -19,18 +20,47 @@ public:
   {
     for (uint32_t i = 0; i < N; i++) values[i] = vals[i];
   }
+  constexpr Vec(const std::initializer_list<T>& vals)
+  {
+    assert(vals.size() == N);
+    uint32_t i = 0;
+    for (const auto& val : vals)
+    {
+      values[i++] = val;
+    }
+  }
+
+  template<typename T2>
+  T& operator[](const T2 idx) requires(std::is_integral<T2>::value)
+  {
+    return values[idx];
+  }
+
+  template<typename T2>
+  T operator[](const T2 idx) const requires(std::is_integral<T2>::value)
+  {
+    return values[idx];
+  }
+
+  template<typename T2>
+  operator Vec<T2, N>() const
+  {
+    Vec<T2, N> result;
+    for (uint32_t i = 0; i < N; i++) result[i] = T2(values[i]);
+    return result;
+  }
 
   T values[N];
 };
 
 // only the operators that are needed are implemented
 // so, not every expected overload might be there already
-template<typename T, int N>
-Vec<T, N> operator+(const Vec<T, N>& a, const Vec<T, N>& b)
+template<typename T1, typename T2, int N>
+Vec<T1, N> operator+(const Vec<T1, N>& a, const Vec<T2, N>& b)
 {
-  T vals[N];
-  for (uint32_t i = 0; i < N; i++) vals[i] = a.values[i] + b.values[i];
-  return Vec<T, N>(vals);
+  T1 vals[N];
+  for (uint32_t i = 0; i < N; i++) vals[i] = a.values[i] + T1(b.values[i]);
+  return Vec<T1, N>(vals);
 }
 
 template<typename T1, typename T2, int N>
@@ -59,6 +89,14 @@ Vec<T, N> operator-(const Vec<T, N>& a)
   T vals[N];
   for (uint32_t i = 0; i < N; i++) vals[i] = -a.values[i];
   return Vec<T, N>(vals);
+}
+
+template<typename T1, typename T2, int N>
+Vec<T1, N> operator/(const Vec<T1, N>& a, const Vec<T2, N>& b)
+{
+  T1 vals[N];
+  for (uint32_t i = 0; i < N; i++) vals[i] = a.values[i] / T1(b.values[i]);
+  return Vec<T1, N>(vals);
 }
 
 template<typename T1, typename T2, int N>
@@ -123,6 +161,36 @@ struct Vec<T, 2>
   constexpr Vec(const T x, const T y) : x(x), y(y) {}
   constexpr Vec(const Vec& other) : x(other.x), y(other.y) {}
   constexpr Vec(const T vals[2]) : x(vals[0]), y(vals[1]) {}
+  constexpr Vec(const std::initializer_list<T>& vals)
+  {
+    assert(vals.size() == 2);
+    uint32_t i = 0;
+    for (const auto& val : vals)
+    {
+      values[i++] = val;
+    }
+  }
+
+  template<typename T2>
+  T& operator[](const T2 idx) requires(std::is_integral<T2>::value)
+  {
+    return values[idx];
+  }
+
+  template<typename T2>
+  T operator[](const T2 idx) const requires(std::is_integral<T2>::value)
+  {
+    return values[idx];
+  }
+
+  template<typename T2>
+  operator Vec<T2, 2>() const
+  {
+    Vec<T2, 2> result;
+    for (uint32_t i = 0; i < 2; i++) result[i] = T2(values[i]);
+    return result;
+  }
+
   union {
     T values[2];
     struct {
@@ -134,7 +202,7 @@ struct Vec<T, 2>
 template<typename T>
 std::ostream& operator<<(std::ostream& out, const Vec<T, 2>& a)
 {
-  out << "(" << a.x << ", " << a.y << ")";
+  out << std::fixed << "(" << a.x << ", " << a.y << ")";
   return out;
 }
 
@@ -146,6 +214,36 @@ struct Vec<T, 3>
   constexpr Vec(const T x, const T y, const T z) : x(x), y(y), z(z) {}
   constexpr Vec(const Vec& other) : x(other.x), y(other.y), z(other.z) {}
   constexpr Vec(const T vals[3]) : x(vals[0]), y(vals[1]), z(vals[2]) {}
+  constexpr Vec(const std::initializer_list<T>& vals)
+  {
+    assert(vals.size() == 3);
+    uint32_t i = 0;
+    for (const auto& val : vals)
+    {
+      values[i++] = val;
+    }
+  }
+
+  template<typename T2>
+  T& operator[](const T2 idx) requires(std::is_integral<T2>::value)
+  {
+    return values[idx];
+  }
+
+  template<typename T2>
+  T operator[](const T2 idx) const requires(std::is_integral<T2>::value)
+  {
+    return values[idx];
+  }
+
+  template<typename T2>
+  operator Vec<T2, 3>() const
+  {
+    Vec<T2, 3> result;
+    for (uint32_t i = 0; i < 3; i++) result[i] = T2(values[i]);
+    return result;
+  }
+
   union {
     T values[3];
     struct {
@@ -157,7 +255,7 @@ struct Vec<T, 3>
 template<typename T>
 std::ostream& operator<<(std::ostream& out, const Vec<T, 3>& a)
 {
-  out << "(" << a.x << ", " << a.y << ", " << a.z << ")";
+  out << std::fixed << "(" << a.x << ", " << a.y << ", " << a.z << ")";
   return out;
 }
 

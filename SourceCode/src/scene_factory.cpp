@@ -1,35 +1,38 @@
+#include "vec.hpp"
+#include "mat.hpp"
 #include "scene.hpp"
+#include "scene_builder.hpp"
 
 Scene create_single_triangle_scene()
 {
-  Scene scene;
-  scene.add_triangle(Triangle(
+  SceneBuilder scene_builder;
+  scene_builder.get_geometry().add_triangle(Triangle(
     cm::Vec3(-1.0, -1.0, -5.0),
     cm::Vec3(1.0, -1.0, -5.0),
     cm::Vec3(0.0, 1.0, -5.0)
   ));
-  return scene;
+  return scene_builder.build_scene();
 }
 
 Scene create_triple_triangle_scene()
 {
-  Scene scene;
-  scene.add_triangle(Triangle(
+  SceneBuilder scene_builder;
+  scene_builder.get_geometry().add_triangle(Triangle(
     cm::Vec3(-1.0, -1.0, -5.0),
     cm::Vec3(1.0, -1.0, -5.0),
     cm::Vec3(0.0, 1.0, -5.0)
   ));
-  scene.add_triangle(Triangle(
+  scene_builder.get_geometry().add_triangle(Triangle(
     cm::Vec3(-2.0, -1.0, -4.0),
     cm::Vec3(0.0, -1.0, -4.0),
     cm::Vec3(-1.0, 1.0, -4.0)
   ));
-  scene.add_triangle(Triangle(
+  scene_builder.get_geometry().add_triangle(Triangle(
     cm::Vec3(0.0, -1.0, -4.0),
     cm::Vec3(2.0, -1.0, -4.0),
     cm::Vec3(1.0, 1.0, -4.0)
   ));
-  return scene;
+  return scene_builder.build_scene();
 }
 
 std::vector<Triangle> add_star(const cm::Vec3& center, float spike_thickness, float tip_length, uint32_t tip_count) {
@@ -52,7 +55,7 @@ std::vector<Triangle> add_star(const cm::Vec3& center, float spike_thickness, fl
 
 Scene create_pyramid_star_scene()
 {
-  Scene scene;
+  SceneBuilder scene_builder;
   // left pyramid
   {
     const std::vector<cm::Vec3> vertices{
@@ -62,10 +65,10 @@ Scene create_pyramid_star_scene()
       cm::Vec3(-4.0, -1.0, -6.0),
       cm::Vec3(-2.0, 1.0, -6.0)
     };
-    scene.add_triangle(Triangle(vertices[0], vertices[1], vertices[4]));
-    scene.add_triangle(Triangle(vertices[1], vertices[2], vertices[4]));
-    scene.add_triangle(Triangle(vertices[2], vertices[3], vertices[4]));
-    scene.add_triangle(Triangle(vertices[3], vertices[0], vertices[4]));
+    scene_builder.get_geometry().add_triangle(Triangle(vertices[0], vertices[1], vertices[4]));
+    scene_builder.get_geometry().add_triangle(Triangle(vertices[1], vertices[2], vertices[4]));
+    scene_builder.get_geometry().add_triangle(Triangle(vertices[2], vertices[3], vertices[4]));
+    scene_builder.get_geometry().add_triangle(Triangle(vertices[3], vertices[0], vertices[4]));
   }
   // right pyramid
   {
@@ -76,15 +79,49 @@ Scene create_pyramid_star_scene()
       cm::Vec3(0.0, -1.0, -6.0),
       cm::Vec3(2.0, 1.0, -6.0)
     };
-    scene.add_triangle(Triangle(vertices[0], vertices[1], vertices[4]));
-    scene.add_triangle(Triangle(vertices[1], vertices[2], vertices[4]));
-    scene.add_triangle(Triangle(vertices[2], vertices[3], vertices[4]));
-    scene.add_triangle(Triangle(vertices[3], vertices[0], vertices[4]));
+    scene_builder.get_geometry().add_triangle(Triangle(vertices[0], vertices[1], vertices[4]));
+    scene_builder.get_geometry().add_triangle(Triangle(vertices[1], vertices[2], vertices[4]));
+    scene_builder.get_geometry().add_triangle(Triangle(vertices[2], vertices[3], vertices[4]));
+    scene_builder.get_geometry().add_triangle(Triangle(vertices[3], vertices[0], vertices[4]));
   }
 
   // star
-  scene.add_triangles(add_star(cm::Vec3(0.0, 0.5, -4.0), 0.1, 0.5, 5));
+  scene_builder.get_geometry().add_triangles(add_star(cm::Vec3(0.0, 0.5, -4.0), 0.1, 0.5, 5));
 
-  return scene;
+  scene_builder.new_keyframe(30);
+  scene_builder.get_camera().set_origin(cm::Vec3(-4.0, 0.0, 1.0));
+  scene_builder.get_camera().set_view_dir(cm::Vec3(0.0, 0.0, -6.0) - scene_builder.get_camera().get_origin());
+
+  scene_builder.new_keyframe(30);
+  scene_builder.get_camera().set_origin(cm::Vec3(-4.0, 4.0, 1.0));
+
+  scene_builder.new_keyframe(30);
+  scene_builder.get_camera().set_view_dir(cm::Vec3(0.0, 0.0, -6.0) - scene_builder.get_camera().get_origin());
+
+  scene_builder.new_keyframe(30);
+  scene_builder.get_camera().set_origin(cm::Vec3(0.0, 0.0, 0.0));
+  scene_builder.get_camera().set_view_dir(cm::Vec3(0.0, 0.0, -1.0));
+
+  scene_builder.new_keyframe(15);
+  scene_builder.get_camera().set_view_dir(cm::rotate(cm::Vec3(0.0, 30.0, 0.0)) * scene_builder.get_camera().get_view_dir());
+  scene_builder.new_keyframe(30);
+  scene_builder.get_camera().set_view_dir(cm::rotate(cm::Vec3(0.0, -60.0, 0.0)) * scene_builder.get_camera().get_view_dir());
+  scene_builder.new_keyframe(15);
+  scene_builder.get_camera().set_view_dir(cm::rotate(cm::Vec3(0.0, 30.0, 0.0)) * scene_builder.get_camera().get_view_dir());
+
+  return scene_builder.build_scene();
+}
+
+Scene hw06_task02()
+{
+  SceneBuilder scene_builder;
+  scene_builder.get_geometry().add_triangle(Triangle(
+    {cm::Vec3(-1.75, -1.75, -3.0)},
+    {cm::Vec3(1.75, -1.75, -3.0)},
+    {cm::Vec3(0.0, 1.75, -3.0)}
+  ));
+  scene_builder.get_camera().set_origin(cm::Vec3(-4.0, 0.0, 1.0));
+  scene_builder.get_camera().set_view_dir(cm::Vec3(0.0, 0.0, -3.0) - scene_builder.get_camera().get_origin());
+  return scene_builder.build_scene();
 }
 

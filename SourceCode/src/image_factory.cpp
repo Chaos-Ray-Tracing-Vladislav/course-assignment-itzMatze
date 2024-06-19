@@ -62,17 +62,3 @@ std::vector<Color> create_circle_image(const cm::Vec2u resolution, const uint32_
   return pixels;
 }
 
-std::vector<Color> create_camera_ray_vis_image(const cm::Vec2u resolution)
-{
-  std::vector<Color> pixels(resolution.x * resolution.y);
-  Camera cam(resolution);
-  for (uint32_t y = 0; y < resolution.y; y++)
-  {
-    for (uint32_t x = 0; x < resolution.x; x++)
-    {
-      pixels[y * resolution.x + x] = Color((cam.get_ray({x, y}).dir + 1.0) / 2.0);
-    }
-  }
-  return pixels;
-}
-
