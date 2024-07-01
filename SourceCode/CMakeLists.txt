@@ -15,10 +15,12 @@ set(SOURCE_FILES
   src/scene_factory.cpp
   src/scene_builder.cpp
   src/file_handler.cpp
-  src/stb_image_write.cpp)
+  dependencies/stb/stb_image_write.cpp)
 
 add_executable(Chaos src/main.cpp ${SOURCE_FILES})
-target_include_directories(Chaos PRIVATE "${PROJECT_SOURCE_DIR}/include")
+target_include_directories(Chaos PRIVATE
+  "${PROJECT_SOURCE_DIR}/include"
+  "${PROJECT_SOURCE_DIR}/dependencies/")
 
 add_executable(hw04 src/hw04.cpp)
 target_include_directories(hw04 PRIVATE "${PROJECT_SOURCE_DIR}/include")
