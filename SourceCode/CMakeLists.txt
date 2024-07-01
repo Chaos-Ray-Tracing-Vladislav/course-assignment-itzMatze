@@ -14,7 +14,7 @@ set(SOURCE_FILES
   src/image_factory.cpp
   src/scene_factory.cpp
   src/scene_builder.cpp
-  src/file_handler.cpp
+  src/image_file_handler.cpp
   dependencies/stb/stb_image_write.cpp)
 
 add_executable(Chaos src/main.cpp ${SOURCE_FILES})

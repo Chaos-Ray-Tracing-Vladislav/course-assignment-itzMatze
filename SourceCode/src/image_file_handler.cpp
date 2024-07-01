@@ -1,8 +1,8 @@
-#include "file_handler.hpp"
+#include "image_file_handler.hpp"
 #include <ctime>
 #include <fstream>
 #include <filesystem>
-#include "stb_image_write.h"
+#include "stb/stb_image_write.h"
 
 void write_image(const std::vector<Color>& pixels, std::string image_path, const cm::Vec2u resolution, FileType type)
 {
