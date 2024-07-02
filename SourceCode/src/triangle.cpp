@@ -1,5 +1,7 @@
 #include "triangle.hpp"
 
+#define EPSILON 0.0001
+
 Triangle::Triangle(const cm::Vec3& v0, const cm::Vec3& v1, const cm::Vec3& v2)
 {
   vertices[0] = v0;
@@ -21,17 +23,17 @@ bool Triangle::intersect(const Ray& ray, float& t, cm::Vec3& p) const
   {
     const cm::Vec3 e = cm::normalize(vertices[1] - vertices[0]);
     const cm::Vec3 vp = cm::normalize(p - vertices[0]);
-    if (cm::dot(normal, cm::normalize(cm::cross(e, vp))) <= 0.0) return false;
+    if (cm::dot(normal, cm::cross(e, vp)) < -EPSILON) return false;
   }
   {
     const cm::Vec3 e = cm::normalize(vertices[2] - vertices[1]);
     const cm::Vec3 vp = cm::normalize(p - vertices[1]);
-    if (cm::dot(normal, cm::normalize(cm::cross(e, vp))) <= 0.0) return false;
+    if (cm::dot(normal, cm::cross(e, vp)) < -EPSILON) return false;
   }
   {
     const cm::Vec3 e = cm::normalize(vertices[0] - vertices[2]);
     const cm::Vec3 vp = cm::normalize(p - vertices[2]);
-    if (cm::dot(normal, cm::normalize(cm::cross(e, vp))) <= 0.0) return false;
+    if (cm::dot(normal, cm::cross(e, vp)) < -EPSILON) return false;
   }
   return true;
 }
