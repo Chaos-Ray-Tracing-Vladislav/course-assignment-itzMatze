@@ -6,6 +6,11 @@
 
 #include "scene_builder.hpp"
 
+cm::Vec3 get_vec3(const rapidjson::GenericValue<rapidjson::UTF8<>>& rj_vec3, int base_index = 0)
+{
+  return cm::Vec3(rj_vec3[base_index].GetFloat(), rj_vec3[base_index + 1].GetFloat(), rj_vec3[base_index + 2].GetFloat());
+}
+
 int load_scene_file(const std::string& file_path, SceneFile& scene_file)
 {
   const std::string path(std::string("../../Scenes/") + file_path);
@@ -39,8 +44,7 @@ int load_scene_file(const std::string& file_path, SceneFile& scene_file)
   scene_builder.get_camera().set_up(cm::Vec3(rj_cam_matrix[3].GetFloat(), rj_cam_matrix[4].GetFloat(), rj_cam_matrix[5].GetFloat()));
   scene_builder.get_camera().set_view_dir(-cm::Vec3(rj_cam_matrix[6].GetFloat(), rj_cam_matrix[7].GetFloat(), rj_cam_matrix[8].GetFloat()));
 
-  const auto& rj_position = doc["camera"]["position"];
-  scene_builder.get_camera().set_origin(cm::Vec3(rj_position[0].GetFloat(), rj_position[1].GetFloat(), rj_position[2].GetFloat()));
+  scene_builder.get_camera().set_origin(get_vec3(doc["camera"]["position"]));
 
   const auto& rj_objects = doc["objects"].GetArray();
   for (const auto& object : rj_objects)
@@ -49,7 +53,7 @@ int load_scene_file(const std::string& file_path, SceneFile& scene_file)
     std::vector<cm::Vec3> vertices;
     for (size_t i = 0; i < rj_vertices.Size(); i += 3)
     {
-      vertices.emplace_back(cm::Vec3(rj_vertices[i].GetFloat(), rj_vertices[i + 1].GetFloat(), rj_vertices[i + 2].GetFloat()));
+      vertices.emplace_back(get_vec3(rj_vertices, i));
     }
 
     const auto& rj_indices = object["triangles"].GetArray();
