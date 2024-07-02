@@ -23,6 +23,11 @@ void SceneBuilder::new_keyframe(uint32_t frame_count)
   camera_keyframes.emplace_back(camera_keyframes.back());
 }
 
+void SceneBuilder::set_background(const Color& color)
+{
+  background_color = color;
+}
+
 const Geometry& SceneBuilder::get_geometry() const
 {
   return *geometry_keyframes.back();
@@ -55,6 +60,6 @@ CameraConfig& SceneBuilder::get_camera()
 
 Scene SceneBuilder::build_scene()
 {
-    return Scene(geometry_keyframes, camera_keyframes, frame_counts);
+  return Scene(geometry_keyframes, camera_keyframes, frame_counts, background_color);
 }
 
