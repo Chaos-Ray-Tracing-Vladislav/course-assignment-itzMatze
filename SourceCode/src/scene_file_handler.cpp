@@ -62,7 +62,7 @@ int load_scene_file(const std::string& file_path, SceneFile& scene_file)
     {
       triangles.emplace_back(vertices[rj_indices[i].GetInt()], vertices[rj_indices[i + 1].GetInt()], vertices[rj_indices[i + 2].GetInt()]);
     }
-    scene_builder.get_geometry().add_new_object(triangles);
+    scene_builder.get_geometry().add_object(triangles);
   }
 
   scene_builder.get_camera().set_focal_length(0.012);
