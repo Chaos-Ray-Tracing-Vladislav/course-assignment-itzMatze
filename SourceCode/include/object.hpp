@@ -9,7 +9,7 @@ public:
   Object() = default;
   Object(const std::vector<Triangle>& triangles);
   const std::vector<Triangle>& get_triangles() const;
-  bool intersect(const Ray& ray, float& t, cm::Vec3& p) const;
+  bool intersect(const Ray& ray, HitInfo& hit_info) const;
 
 private:
   std::vector<Triangle> triangles;

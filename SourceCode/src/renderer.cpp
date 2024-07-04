@@ -31,16 +31,15 @@ void Renderer::render()
 std::vector<Color> Renderer::render_frame()
 {
   std::vector<Color> pixels(resolution.x * resolution.y);
-  float t;
-  cm::Vec3 p;
+  HitInfo hit_info;
   for (uint32_t y = 0; y < resolution.y; y++)
   {
     for (uint32_t x = 0; x < resolution.x; x++)
     {
-      if (scene.get_geometry().intersect(scene.get_camera().get_ray(get_camera_coordinates({x, y})), t, p))
+      if (scene.get_geometry().intersect(scene.get_camera().get_ray(get_camera_coordinates({x, y})), hit_info))
       {
         // reduce color intensity with distance to visualize object distance in image
-        float intensity = std::max(1.0 - (t / 40.0), 0.0);
+        float intensity = std::max(1.0 - (hit_info.t / 40.0), 0.0);
         pixels[y * resolution.x + x] = Color(intensity, 0.0, intensity);
       }
       else

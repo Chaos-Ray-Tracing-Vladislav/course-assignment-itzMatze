@@ -32,22 +32,20 @@ const InterpolatableData<Object>& Geometry::get_interpolatable_objects() const
   return objects;
 }
 
-bool Geometry::intersect(const Ray& ray, float& t, cm::Vec3& p) const
+bool Geometry::intersect(const Ray& ray, HitInfo& hit_info) const
 {
-  t = std::numeric_limits<float>::max();
-  float cur_t;
-  cm::Vec3 cur_p;
+  hit_info.t = std::numeric_limits<float>::max();
+  HitInfo cur_hit_info;
   for (const auto& object : objects.get_data())
   {
     // test if object is intersected and if yes whether the intersection is closer than the previous ones
-    if (object.intersect(ray, cur_t, cur_p) && (cur_t < t))
+    if (object.intersect(ray, cur_hit_info) && (cur_hit_info.t < hit_info.t))
     {
-      t = cur_t;
-      p = cur_p;
+      hit_info = cur_hit_info;
     }
   }
   // if an intersection was found, t is the distance to this intersection instead of maximum float value
-  return (t < std::numeric_limits<float>::max());
+  return (hit_info.t < std::numeric_limits<float>::max());
 }
 
 Geometry interpolate(const Geometry& a, const Geometry& b, float weight)
