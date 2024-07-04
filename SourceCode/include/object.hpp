@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "triangle.hpp"
+#include "hit_info.hpp"
 
 class Object
 {

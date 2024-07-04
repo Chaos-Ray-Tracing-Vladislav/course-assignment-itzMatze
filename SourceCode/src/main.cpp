@@ -19,9 +19,9 @@ int main(int argc, char** argv)
   SceneFile scene_file;
   Renderer renderer;
   // render all scenes
-  for (uint32_t i = 0; i < 5; i++)
+  for (uint32_t i = 0; i < 4; i++)
   {
-    std::string file("07/scene" + std::to_string(i) + ".crtscene");
+    std::string file("08/scene" + std::to_string(i) + ".crtscene");
     if (load_scene_file(file, scene_file)) return 1;
     renderer.init(scene_file.scene, scene_file.settings.resolution, file);
     renderer.render();

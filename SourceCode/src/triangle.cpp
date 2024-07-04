@@ -35,6 +35,7 @@ bool Triangle::intersect(const Ray& ray, HitInfo& hit_info) const
     const cm::Vec3 vp = cm::normalize(hit_info.pos - vertices[2]);
     if (cm::dot(normal, cm::cross(e, vp)) < -EPSILON) return false;
   }
+  hit_info.normal = normal;
   return true;
 }
 

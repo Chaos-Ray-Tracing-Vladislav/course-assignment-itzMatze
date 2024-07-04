@@ -3,7 +3,6 @@
 #include <cassert>
 #include <cstdint>
 #include <vector>
-#include <stdexcept>
 
 template<typename T>
 concept Interpolatable = requires(const T& a, const T& b, float weight)
@@ -12,31 +11,48 @@ concept Interpolatable = requires(const T& a, const T& b, float weight)
 };
 
 // stores a list of interpolatable elements to interpolate between two lists of elements properly
-// single elements are interpolated trivially and should not use this class
 template<Interpolatable T>
 class InterpolatableData
 {
 public:
   InterpolatableData() = default;
+  InterpolatableData(const std::vector<T>& data, const std::vector<uint32_t>& ids) : data(data), ids(ids)
+  {
+    assert(this->data.size() == this->ids.size());
+    // make sure the ids are unique
+#if !defined(NDEBUG)
+    for (uint32_t i = 1; i < ids.size(); i++)
+    {
+      assert(ids[i - 1] < ids[i]);
+    }
+#endif
+  }
 
-  void add_new_data(const T& datum)
+  uint32_t add_new_data(const T& datum)
   {
     // assign ascending indices to objects
     uint32_t id = ids.size() == 0 ? 0 : ids.back() + 1;
     data.emplace_back(datum);
+    return id;
   }
 
-  void add_data_with_id(const T& datum, uint32_t id)
+  T& get_element(uint32_t id)
   {
-    // make sure the ids are unique
-#if !defined(NDEBUG)
-    for (const auto& id_it : ids)
-    {
-      if (id_it == id) throw std::runtime_error("Error: Duplicate object id!");
-    }
-    if (ids.size() > 0) assert(ids.back() < id);
-#endif
-    data.emplace_back(datum);
+    uint32_t idx = id;
+    while (id < ids[idx]) idx--;
+    while (id > ids[idx]) idx++;
+    assert(id == ids[idx]);
+    return data[idx];
+  }
+
+  void remove_element(uint32_t id)
+  {
+    uint32_t idx = id;
+    while (id < ids[idx]) idx--;
+    while (id > ids[idx]) idx++;
+    assert(id == ids[idx]);
+    data.erase(data.begin() + idx);
+    ids.erase(ids.begin() + idx);
   }
 
   const std::vector<T>& get_data() const
@@ -57,7 +73,8 @@ private:
 template<typename T>
 InterpolatableData<T> interpolate(const InterpolatableData<T>& a, const InterpolatableData<T>& b, float weight)
 {
-  InterpolatableData<T> result;
+  std::vector<T> result_data;
+  std::vector<uint32_t> result_ids;
   const std::vector<T>& data_a = a.get_data();
   const std::vector<uint32_t>& ids_a = a.get_ids();
   const std::vector<T>& data_b = b.get_data();
@@ -68,19 +85,21 @@ InterpolatableData<T> interpolate(const InterpolatableData<T>& a, const Interpol
   {
     if (ids_a[i] == ids_b[j])
     {
-      result.add_data_with_id(interpolate(data_a[i], data_b[i], weight), ids_a[i]);
+      result_data.emplace_back(interpolate(data_a[i], data_b[i], weight));
+      result_ids.emplace_back(ids_a[i]);
       i++;
       j++;
     }
     else if (ids_a[i] < ids_b[j])
     {
       // add data from previous keyframe that are not present in the next keyframe
-      result.add_data_with_id(data_a[i], ids_a[i]);
+      result_data.emplace_back(data_a[i]);
+      result_ids.emplace_back(ids_a[i]);
       i++;
     }
     // additional data in the next keyframe will be added when that keyframe is reached
     else if (ids_a[i] > ids_b[j]) j++;
   }
-  return result;
+  return InterpolatableData(result_data, result_ids);
 }
 

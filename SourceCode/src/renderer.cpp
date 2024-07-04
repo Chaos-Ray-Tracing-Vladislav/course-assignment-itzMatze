@@ -38,9 +38,26 @@ std::vector<Color> Renderer::render_frame()
     {
       if (scene.get_geometry().intersect(scene.get_camera().get_ray(get_camera_coordinates({x, y})), hit_info))
       {
-        // reduce color intensity with distance to visualize object distance in image
-        float intensity = std::max(1.0 - (hit_info.t / 40.0), 0.0);
-        pixels[y * resolution.x + x] = Color(intensity, 0.0, intensity);
+        constexpr cm::Vec3 albedo = cm::Vec3(0.99, 0.01, 0.55);
+        if (scene.get_lights().size() > 0)
+        {
+          cm::Vec3 color(0.0, 0.0, 0.0);
+          for (const auto& light : scene.get_lights())
+          {
+            cm::Vec3 contribution = cm::Vec3(light.get_intensity());
+            contribution *= std::max(0.0f, cm::dot(hit_info.normal, cm::normalize(light.get_position() - hit_info.pos)));
+            contribution /= cm::length(light.get_position() - hit_info.pos);
+            contribution *= albedo;
+            color += contribution;
+          }
+          pixels[y * resolution.x + x] = Color(color);
+        }
+        else
+        {
+          // reduce color intensity with distance to visualize object distance in image
+          float intensity = std::max(1.0 - (hit_info.t / 40.0), 0.0);
+          pixels[y * resolution.x + x] = Color(intensity, 0.0, intensity);
+        }
       }
       else
       {

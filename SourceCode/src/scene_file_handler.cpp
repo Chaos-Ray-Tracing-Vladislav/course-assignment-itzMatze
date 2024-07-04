@@ -46,6 +46,17 @@ int load_scene_file(const std::string& file_path, SceneFile& scene_file)
 
   scene_builder.get_camera().set_origin(get_vec3(doc["camera"]["position"]));
 
+  if (doc.HasMember("lights"))
+  {
+    const auto& rj_lights = doc["lights"].GetArray();
+    for (const auto& light : rj_lights)
+    {
+      float intensity = light["intensity"].GetFloat();
+      cm::Vec3 position = get_vec3(light["position"]);
+      scene_builder.get_lights().add_new_data(Light(intensity, position));
+    }
+  }
+
   const auto& rj_objects = doc["objects"].GetArray();
   for (const auto& object : rj_objects)
   {
