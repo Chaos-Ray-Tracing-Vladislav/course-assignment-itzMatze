@@ -36,6 +36,8 @@ bool Triangle::intersect(const Ray& ray, HitInfo& hit_info) const
     if (cm::dot(normal, cm::cross(e, vp)) < -EPSILON) return false;
   }
   hit_info.normal = normal;
+  hit_info.bary.u = cm::length(cm::cross(hit_info.pos - vertices[0], vertices[2] - vertices[0])) / cm::length(cm::cross(vertices[1] - vertices[0], vertices[2] - vertices[0]));
+  hit_info.bary.v = cm::length(cm::cross(hit_info.pos - vertices[0], vertices[1] - vertices[0])) / cm::length(cm::cross(vertices[1] - vertices[0], vertices[2] - vertices[0]));
   return true;
 }
 

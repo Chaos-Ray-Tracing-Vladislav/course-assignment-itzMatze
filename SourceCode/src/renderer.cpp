@@ -38,6 +38,10 @@ std::vector<Color> Renderer::render_frame()
     {
       if (scene.get_geometry().intersect(scene.get_camera().get_ray(get_camera_coordinates({x, y})), hit_info))
       {
+#if 1
+        // barycentric coordinates debug visualization
+        pixels[y * resolution.x + x] = Color(hit_info.bary.x, hit_info.bary.y, 1.0);
+#else
         constexpr cm::Vec3 albedo = cm::Vec3(0.99, 0.01, 0.55);
         if (scene.get_lights().size() > 0)
         {
@@ -58,6 +62,7 @@ std::vector<Color> Renderer::render_frame()
           float intensity = std::max(1.0 - (hit_info.t / 40.0), 0.0);
           pixels[y * resolution.x + x] = Color(intensity, 0.0, intensity);
         }
+#endif
       }
       else
       {

@@ -204,6 +204,9 @@ struct Vec<T, 2>
     struct {
       T x, y;
     };
+    struct {
+      T u, v;
+    };
   };
 };
 
