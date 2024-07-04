@@ -12,6 +12,6 @@ public:
   bool intersect(const Ray& ray, HitInfo& hit_info) const;
 
   cm::Vec3 vertices[3];
-  cm::Vec3 normal;
+  cm::Vec3 geometric_normal;
 };
 
