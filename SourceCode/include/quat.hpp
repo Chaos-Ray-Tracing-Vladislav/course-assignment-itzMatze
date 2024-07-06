@@ -6,19 +6,19 @@
 
 // chaos math
 namespace cm {
-template<std::floating_point T = float>
-struct Quat
+template<std::floating_point T>
+struct Quaternion
 {
-  constexpr Quat() = default;
-  constexpr explicit Quat(const T vals[4])
+  constexpr Quaternion() = default;
+  constexpr explicit Quaternion(const T vals[4])
   {
     for (uint32_t i = 0; i < 4; i++) values[i] = vals[i];
   }
-  constexpr explicit Quat(T w, T x, T y, T z) : w(w), x(x), y(y), z(z)
+  constexpr explicit Quaternion(T w, T x, T y, T z) : w(w), x(x), y(y), z(z)
   {}
-  constexpr explicit Quat(T w, const Vec<T, 3>& xyz) : w(w), x(xyz.x), y(xyz.y), z(xyz.z)
+  constexpr explicit Quaternion(T w, const Vec<T, 3>& xyz) : w(w), x(xyz.x), y(xyz.y), z(xyz.z)
   {}
-  constexpr Quat(const std::initializer_list<T>& vals)
+  constexpr Quaternion(const std::initializer_list<T>& vals)
   {
     assert(vals.size() == 4);
     uint32_t i = 0;
@@ -38,16 +38,16 @@ struct Quat
   };
 };
 
-template<typename T1 = float, typename T2 = float>
-Quat<T1> angle_axis(T2 angle, const cm::Vec3& axis)
+template<typename T>
+Quaternion<T> angle_axis(T angle, const cm::Vec<T, 3>& axis)
 {
-  return Quat<T1>(std::cos(angle * 0.5), axis * std::sin(angle * 0.5));
+  return Quaternion<T>(std::cos(angle * 0.5), axis * std::sin(angle * 0.5));
 }
 
-template<typename T1 = float, typename T2 = float>
-Quat<T1> operator*(const Quat<T1>& a, const Quat<T2>& b)
+template<typename T1, typename T2>
+Quaternion<T1> operator*(const Quaternion<T1>& a, const Quaternion<T2>& b)
 {
-  Quat<T1> result;
+  Quaternion<T1> result;
   result.w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z;
   result.x = a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y;
   result.y = a.w * b.y + a.y * b.w + a.z * b.x - a.x * b.z;
@@ -58,89 +58,89 @@ Quat<T1> operator*(const Quat<T1>& a, const Quat<T2>& b)
 // only the operators that are needed are implemented
 // so, not every expected overload might be there already
 template<typename T1, typename T2>
-Quat<T1> operator+(const Quat<T1>& a, const Quat<T2>& b)
+Quaternion<T1> operator+(const Quaternion<T1>& a, const Quaternion<T2>& b)
 {
   T1 vals[4];
   for (uint32_t i = 0; i < 4; i++) vals[i] = a.values[i] + T1(b.values[i]);
-  return Quat<T1>(vals);
+  return Quaternion<T1>(vals);
 }
 
 template<typename T1, typename T2>
-Quat<T1> operator+(const Quat<T1>& a, const T2 b)
+Quaternion<T1> operator+(const Quaternion<T1>& a, const T2 b)
 {
   T1 vals[4];
   for (uint32_t i = 0; i < 4; i++) vals[i] = a.values[i] + T1(b);
-  return Quat<T1>(vals);
+  return Quaternion<T1>(vals);
 }
 
 template<typename T>
-Quat<T> operator-(const Quat<T>& a, const Quat<T>& b)
+Quaternion<T> operator-(const Quaternion<T>& a, const Quaternion<T>& b)
 {
   return operator+(a, -b);
 }
 
 template<typename T1, typename T2>
-Quat<T1> operator-(const Quat<T1>& a, const T2 b)
+Quaternion<T1> operator-(const Quaternion<T1>& a, const T2 b)
 {
   return operator+(a, -b);
 }
 
 template<typename T>
-Quat<T> operator-(const Quat<T>& a)
+Quaternion<T> operator-(const Quaternion<T>& a)
 {
   T vals[4];
   for (uint32_t i = 0; i < 4; i++) vals[i] = -a.values[i];
-  return Quat<T>(vals);
+  return Quaternion<T>(vals);
 }
 
 template<typename T1, typename T2>
-Quat<T1> operator/(const Quat<T1>& a, const T2 b)
+Quaternion<T1> operator/(const Quaternion<T1>& a, const T2 b)
 {
   T1 vals[4];
   for (uint32_t i = 0; i < 4; i++) vals[i] = a.values[i] / T1(b);
-  return Quat<T1>(vals);
+  return Quaternion<T1>(vals);
 }
 
 template<typename T1, typename T2>
-Quat<T1> operator*(const Quat<T1>& a, const T2 b)
+Quaternion<T1> operator*(const Quaternion<T1>& a, const T2 b)
 {
   T1 vals[4];
   for (uint32_t i = 0; i < 4; i++) vals[i] = a.values[i] * T1(b);
-  return Quat<T1>(vals);
+  return Quaternion<T1>(vals);
 }
 
 template<typename T1, typename T2>
-Quat<T1> operator*(const T2 a, const Quat<T1>& b)
+Quaternion<T1> operator*(const T2 a, const Quaternion<T1>& b)
 {
   return operator*(b, a);
 }
 
-template<typename T = float>
-Quat<T> conjugate(const Quat<T>& q)
+template<typename T>
+Quaternion<T> conjugate(const Quaternion<T>& q)
 {
-  return Quat({q.w, -q.x, -q.y, -q.z});
+  return Quaternion({q.w, -q.x, -q.y, -q.z});
 }
 
-template<typename T = float>
-Quat<T> normalize(const Quat<T>& q)
+template<typename T>
+Quaternion<T> normalize(const Quaternion<T>& q)
 {
-  float result = 0.0;
+  T result = 0.0;
   for (uint32_t i = 0; i < 4; i++) result += q.values[i] * q.values[i];
   result = std::sqrt(result);
-  return Quat<T>(q.w / result, q.x / result, q.y / result, q.z / result);
+  return Quaternion<T>(q.w / result, q.x / result, q.y / result, q.z / result);
 }
 
-template<typename T = float>
-T dot(const Quat<T>& a, const Quat<T>& b)
+template<typename T>
+T dot(const Quaternion<T>& a, const Quaternion<T>& b)
 {
-  float result = 0.0;
+  T result = 0.0;
   for (uint32_t i = 0; i < 4; i++) result += a.values[i] * b.values[i];
   return result;
 }
 
 // taken from glm library: https://github.com/g-truc/glm
-template<typename T = float>
-Quat<T> quat_cast(const Mat3& m)
+template<typename T>
+Quaternion<T> quat_cast(const Mat<T, 3, 3>& m)
 {
   T fourXSquaredMinus1 = m[0][0] - m[1][1] - m[2][2];
   T fourYSquaredMinus1 = m[1][1] - m[0][0] - m[2][2];
@@ -171,26 +171,27 @@ Quat<T> quat_cast(const Mat3& m)
   switch(biggestIndex)
   {
   case 0:
-    return normalize(Quat<T>(biggestVal, (m[1][2] - m[2][1]) * mult, (m[2][0] - m[0][2]) * mult, (m[0][1] - m[1][0]) * mult));
+    return normalize(Quaternion<T>(biggestVal, (m[1][2] - m[2][1]) * mult, (m[2][0] - m[0][2]) * mult, (m[0][1] - m[1][0]) * mult));
   case 1:
-    return normalize(Quat<T>((m[1][2] - m[2][1]) * mult, biggestVal, (m[0][1] + m[1][0]) * mult, (m[2][0] + m[0][2]) * mult));
+    return normalize(Quaternion<T>((m[1][2] - m[2][1]) * mult, biggestVal, (m[0][1] + m[1][0]) * mult, (m[2][0] + m[0][2]) * mult));
   case 2:
-    return normalize(Quat<T>((m[2][0] - m[0][2]) * mult, (m[0][1] + m[1][0]) * mult, biggestVal, (m[1][2] + m[2][1]) * mult));
+    return normalize(Quaternion<T>((m[2][0] - m[0][2]) * mult, (m[0][1] + m[1][0]) * mult, biggestVal, (m[1][2] + m[2][1]) * mult));
   case 3:
-    return normalize(Quat<T>((m[0][1] - m[1][0]) * mult, (m[2][0] + m[0][2]) * mult, (m[1][2] + m[2][1]) * mult, biggestVal));
+    return normalize(Quaternion<T>((m[0][1] - m[1][0]) * mult, (m[2][0] + m[0][2]) * mult, (m[1][2] + m[2][1]) * mult, biggestVal));
   default: // Silence a -Wswitch-default warning in GCC. Should never actually get here. Assert is just for sanity.
     assert(false);
-    return Quat<T>(1.0, 0.0, 0.0, 0.0);
+    return Quaternion<T>(1.0, 0.0, 0.0, 0.0);
   }
 }
 
-inline Quat<float> quat_look_at(const cm::Vec3& view_dir, const cm::Vec3& up = cm::Vec3(0.0, 1.0, 0.0))
+template<typename T>
+inline Quaternion<T> quat_look_at(const cm::Vec<T, 3>& view_dir, const cm::Vec<T, 3>& up = cm::Vec3(0.0, 1.0, 0.0))
 {
-  return quat_cast(look_at(view_dir, up));
+  return quat_cast<T>(look_at(view_dir, up));
 }
 
-template<typename T = float>
-Quat<T> slerp(const Quat<T>& a, Quat<T> b, float weight)
+template<typename T>
+Quaternion<T> slerp(const Quaternion<T>& a, Quaternion<T> b, T weight)
 {
   T cos_theta = dot(a, b);
 
@@ -204,7 +205,7 @@ Quat<T> slerp(const Quat<T>& a, Quat<T> b, float weight)
   // lerp for almost identical quats to prevent divison by zero
   if(cos_theta > 0.999)
   {
-    return normalize(Quat<T>(
+    return normalize(Quaternion<T>(
       (1 - weight) * a.w + weight * b.w,
       (1 - weight) * a.x + weight * b.x,
       (1 - weight) * a.y + weight * b.y,
@@ -216,4 +217,6 @@ Quat<T> slerp(const Quat<T>& a, Quat<T> b, float weight)
     return (std::sin((1.0 - weight) * angle) * a + sin(weight * angle) * b) / std::sin(angle);
   }
 }
+using Quatf = Quaternion<float>;
+using Quatd = Quaternion<double>;
 } // namespace cm
