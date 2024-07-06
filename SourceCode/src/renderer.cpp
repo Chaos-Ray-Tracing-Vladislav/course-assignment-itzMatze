@@ -38,9 +38,12 @@ std::vector<Color> Renderer::render_frame()
     {
       if (scene.get_geometry().intersect(scene.get_camera().get_ray(get_camera_coordinates({x, y})), hit_info))
       {
-#if 1
+#if 0
         // barycentric coordinates debug visualization
         pixels[y * resolution.x + x] = Color(hit_info.bary.x, hit_info.bary.y, 1.0);
+#elif 1
+        // normal debug visualization
+        pixels[y * resolution.x + x] = Color((hit_info.normal + 1.0) / 2.0);
 #else
         constexpr cm::Vec3 albedo = cm::Vec3(0.99, 0.01, 0.55);
         if (scene.get_lights().size() > 0)

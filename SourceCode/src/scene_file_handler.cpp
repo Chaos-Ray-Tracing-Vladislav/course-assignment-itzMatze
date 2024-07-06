@@ -63,19 +63,19 @@ int load_scene_file(const std::string& file_path, SceneFile& scene_file)
   for (const auto& object : rj_objects)
   {
     const auto& rj_vertices = object["vertices"].GetArray();
-    std::vector<cm::Vec3> vertices;
+    std::vector<Vertex> vertices;
     for (size_t i = 0; i < rj_vertices.Size(); i += 3)
     {
       vertices.emplace_back(get_vec3(rj_vertices, i));
     }
 
     const auto& rj_indices = object["triangles"].GetArray();
-    std::vector<Triangle> triangles;
-    for (size_t i = 0; i < rj_indices.Size(); i += 3)
+    std::vector<uint32_t> indices;
+    for (size_t i = 0; i < rj_indices.Size(); i++)
     {
-      triangles.emplace_back(vertices[rj_indices[i].GetInt()], vertices[rj_indices[i + 1].GetInt()], vertices[rj_indices[i + 2].GetInt()]);
+      indices.emplace_back(rj_indices[i].GetInt());
     }
-    scene_builder.get_geometry().add_object(triangles);
+    scene_builder.get_geometry().add_object(Object(vertices, indices, true));
   }
 
   scene_builder.get_camera().set_focal_length(0.012);

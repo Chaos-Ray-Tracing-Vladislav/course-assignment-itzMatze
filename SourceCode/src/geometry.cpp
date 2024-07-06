@@ -2,24 +2,13 @@
 #include <limits>
 #include <vector>
 #include "interpolatable_data.hpp"
-#include "triangle.hpp"
-
-Geometry::Geometry(const std::vector<Triangle>& triangles)
-{
-  objects.add_new_data(Object(triangles));
-}
 
 Geometry::Geometry(const InterpolatableData<Object>& objects) : objects(objects)
 {}
 
-void Geometry::add_triangle(const Triangle& triangle)
+void Geometry::add_object(const Object& object)
 {
-  objects.add_new_data(Object({triangle}));
-}
-
-void Geometry::add_object(const std::vector<Triangle>& triangles)
-{
-  objects.add_new_data(Object(triangles));
+  objects.add_new_data(object);
 }
 
 const std::vector<Object>& Geometry::get_objects() const
