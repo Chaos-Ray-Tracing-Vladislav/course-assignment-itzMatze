@@ -30,11 +30,11 @@ Object interpolate(const Object& a, const Object& b, float weight)
   const std::vector<Triangle>& triangles_a = a.get_triangles();
   const std::vector<Triangle>& triangles_b = b.get_triangles();
   assert(triangles_a.size() == triangles_b.size());
-  for (uint32_t i = 0, j = 0; i < triangles_a.size() && j < triangles_b.size();)
+  for (uint32_t i = 0; i < triangles_a.size(); i++)
   {
       // interpolate triangle
       cm::Vec3 vertices[3];
-      for (uint32_t k = 0; k < 3; k++) vertices[k] = (1.0 - weight) * triangles_a[i].vertices[k] + weight * triangles_b[j].vertices[k];
+      for (uint32_t k = 0; k < 3; k++) vertices[k] = (1.0 - weight) * triangles_a[i].vertices[k] + weight * triangles_b[i].vertices[k];
       triangles.emplace_back(Triangle(vertices[0], vertices[1], vertices[2]));
   }
   return Object(triangles);

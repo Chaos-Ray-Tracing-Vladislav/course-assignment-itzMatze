@@ -24,6 +24,7 @@ void SceneBuilder::new_keyframe(uint32_t frame_count)
   // store next keyframe as pointer to last keyframe
   // copy keyframe in non-const getter because then the user wants to change it
   geometry_keyframes.emplace_back(geometry_keyframes.back());
+  light_keyframes.emplace_back(light_keyframes.back());
   camera_keyframes.emplace_back(camera_keyframes.back());
 }
 

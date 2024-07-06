@@ -33,6 +33,7 @@ public:
     // assign ascending indices to objects
     uint32_t id = ids.size() == 0 ? 0 : ids.back() + 1;
     data.emplace_back(datum);
+    ids.emplace_back(id);
     return id;
   }
 

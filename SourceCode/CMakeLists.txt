@@ -3,6 +3,7 @@ project(Chaos)
 set(CMAKE_CXX_STANDARD 20)
 
 set(SOURCE_FILES
+  src/spatial_configuration.cpp
   src/camera.cpp
   src/ray.cpp
   src/triangle.cpp

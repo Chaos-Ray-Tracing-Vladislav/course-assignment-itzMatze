@@ -41,10 +41,12 @@ int load_scene_file(const std::string& file_path, SceneFile& scene_file)
   scene_builder.set_background(Color(rj_background_color[0].GetFloat(), rj_background_color[1].GetFloat(), rj_background_color[2].GetFloat()));
 
   const auto& rj_cam_matrix = doc["camera"]["matrix"];
-  scene_builder.get_camera().set_up(cm::Vec3(rj_cam_matrix[3].GetFloat(), rj_cam_matrix[4].GetFloat(), rj_cam_matrix[5].GetFloat()));
-  scene_builder.get_camera().set_view_dir(-cm::Vec3(rj_cam_matrix[6].GetFloat(), rj_cam_matrix[7].GetFloat(), rj_cam_matrix[8].GetFloat()));
+  const cm::Mat3 orientation({get_vec3(rj_cam_matrix, 0),
+                              get_vec3(rj_cam_matrix, 3),
+                              get_vec3(rj_cam_matrix, 6)});
+  scene_builder.get_camera().get_spatial_conf().set_orientation(orientation);
 
-  scene_builder.get_camera().set_origin(get_vec3(doc["camera"]["position"]));
+  scene_builder.get_camera().get_spatial_conf().set_position(get_vec3(doc["camera"]["position"]));
 
   if (doc.HasMember("lights"))
   {
