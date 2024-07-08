@@ -26,8 +26,8 @@ bool Triangle::intersect(const Ray& ray, HitInfo& hit_info, const std::vector<Ve
   // backface culling
   if (dot_n_dir >= 0.0) return false;
   hit_info.t = (cm::dot(geometric_normal, v0.pos) - cm::dot(ray.origin, geometric_normal)) / dot_n_dir;
-  // hit is behind the ray
-  if (hit_info.t < 0.0) return false;
+  // hit is behind the ray or outside of allowed range
+  if (hit_info.t < 0.0 || hit_info.t > ray.max_t) return false;
   hit_info.pos = ray.at(hit_info.t);
   // check if point lies inside or outside of the triangle
   {

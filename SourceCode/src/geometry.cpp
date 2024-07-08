@@ -1,5 +1,4 @@
 #include "geometry.hpp"
-#include <limits>
 #include <vector>
 #include "interpolatable_data.hpp"
 
@@ -46,10 +45,11 @@ bool Geometry::intersect(const Ray& ray, HitInfo& hit_info) const
     if (object.intersect(ray, cur_hit_info) && (cur_hit_info.t < hit_info.t))
     {
       hit_info = cur_hit_info;
+      if (ray.anyhit) return true;
     }
   }
   // if an intersection was found, t is the distance to this intersection instead of maximum float value
-  return (hit_info.t < std::numeric_limits<float>::max());
+  return (hit_info.t < ray.max_t);
 }
 
 Geometry interpolate(const Geometry& a, const Geometry& b, float weight)

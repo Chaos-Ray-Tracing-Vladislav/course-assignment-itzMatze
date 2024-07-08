@@ -59,6 +59,9 @@ std::vector<Color> Renderer::render_frame()
             for (const auto& light : scene.get_lights())
             {
               const cm::Vec3 outgoing_dir = cm::normalize(light.get_position() - hit_info.pos);
+              // trace shadow ray with small offset in the direction of the normal to avoid shadow acne
+              const Ray shadow_ray(hit_info.pos + 0.01 * hit_info.geometric_normal, outgoing_dir, cm::length(light.get_position() - hit_info.pos), true);
+              if (scene.get_geometry().intersect(shadow_ray, hit_info)) continue;
               cm::Vec3 contribution = cm::Vec3(light.get_intensity());
               contribution *= throughput * material.eval(hit_info, ray.dir, outgoing_dir);
               contribution /= cm::length(light.get_position() - hit_info.pos);
