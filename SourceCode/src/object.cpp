@@ -4,8 +4,8 @@
 #include "vec.hpp"
 
 // only triangles are supported
-Object::Object(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const SpatialConfiguration& spatial_conf, bool compute_normals) :
-  vertices(vertices), spatial_conf(spatial_conf)
+Object::Object(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const SpatialConfiguration& spatial_conf, int32_t material_idx, bool compute_normals) :
+  vertices(vertices), spatial_conf(spatial_conf), material_idx(material_idx)
 {
   assert(indices.size() % 3 == 0);
   for (uint32_t i = 0; i < indices.size(); i += 3)
@@ -23,8 +23,8 @@ Object::Object(const std::vector<Vertex>& vertices, const std::vector<uint32_t>&
   }
 }
 
-Object::Object(const std::vector<Vertex>& vertices, const std::vector<Triangle>& triangles, const SpatialConfiguration& spatial_conf) :
-  vertices(vertices), triangles(triangles), spatial_conf(spatial_conf)
+Object::Object(const std::vector<Vertex>& vertices, const std::vector<Triangle>& triangles, const SpatialConfiguration& spatial_conf, int32_t material_idx) :
+  vertices(vertices), triangles(triangles), spatial_conf(spatial_conf), material_idx(material_idx)
 {}
 
 const std::vector<Triangle>& Object::get_triangles() const
@@ -66,6 +66,7 @@ bool Object::intersect(const Ray& ray, HitInfo& hit_info) const
     // transform normals
     hit_info.geometric_normal = spatial_conf.transform_dir(hit_info.geometric_normal);
     hit_info.normal = spatial_conf.transform_dir(hit_info.normal);
+    hit_info.material_idx = material_idx;
     return true;
   }
   return false;

@@ -151,6 +151,16 @@ Vec<T, N> normalize(const Vec<T, N>& a) requires(std::is_floating_point<T>::valu
   return a / length(a);
 }
 
+template<typename T, int N>
+bool operator==(const Vec<T, N>& a, const Vec<T, N>& b)
+{
+  for (uint32_t i = 0; i < N; i++)
+  {
+    if (a[i] != b[i]) return false;
+  }
+  return true;
+}
+
 template<typename T>
 Vec<T, 3> cross(const Vec<T, 3>& a, const Vec<T, 3>& b) requires(std::is_floating_point<T>::value)
 {
@@ -159,6 +169,12 @@ Vec<T, 3> cross(const Vec<T, 3>& a, const Vec<T, 3>& b) requires(std::is_floatin
   result.y = a.z * b.x - a.x * b.z;
   result.z = a.x * b.y - a.y * b.x;
   return result;
+}
+
+template<typename T>
+Vec<T, 3> reflect(const Vec<T, 3>& a, const Vec<T, 3>& b) requires(std::is_floating_point<T>::value)
+{
+  return a - 2.0 * cm::dot(a, b) * b;
 }
 
 template<typename T>

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 
+#include "material.hpp"
 #include "rapidjson/document.h"
 
 #include "scene_builder.hpp"
@@ -59,6 +60,20 @@ int load_scene_file(const std::string& file_path, SceneFile& scene_file)
     }
   }
 
+  if (doc.HasMember("materials"))
+  {
+    const auto& rj_materials = doc["materials"].GetArray();
+    for (const auto& material : rj_materials)
+    {
+      cm::Vec3 albedo = get_vec3(material["albedo"]);
+      bool smooth_shading = material["smooth_shading"].GetBool();
+      MaterialType type;
+      if (std::string("diffuse") == material["type"].GetString()) type = MaterialType::Diffuse;
+      else if (std::string("reflective") == material["type"].GetString()) type = MaterialType::Reflective;
+      scene_builder.get_geometry().add_material(Material(type, albedo, smooth_shading));
+    }
+  }
+
   const auto& rj_objects = doc["objects"].GetArray();
   for (const auto& object : rj_objects)
   {
@@ -75,7 +90,9 @@ int load_scene_file(const std::string& file_path, SceneFile& scene_file)
     {
       indices.emplace_back(rj_indices[i].GetInt());
     }
-    scene_builder.get_geometry().add_object(Object(vertices, indices, SpatialConfiguration(), true));
+    int32_t material_idx = -1;
+    if (object.HasMember("material_index")) material_idx = object["material_index"].GetInt();
+    scene_builder.get_geometry().add_object(Object(vertices, indices, SpatialConfiguration(), material_idx, true));
   }
 
   scene_builder.get_camera().set_focal_length(0.012);

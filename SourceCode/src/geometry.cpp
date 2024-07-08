@@ -3,12 +3,17 @@
 #include <vector>
 #include "interpolatable_data.hpp"
 
-Geometry::Geometry(const InterpolatableData<Object>& objects) : objects(objects)
+Geometry::Geometry(const InterpolatableData<Object>& objects, const std::vector<Material>& materials) : objects(objects), materials(materials)
 {}
 
 uint32_t Geometry::add_object(const Object& object)
 {
   return objects.add_new_data(object);
+}
+
+void Geometry::add_material(const Material& material)
+{
+  materials.emplace_back(material);
 }
 
 const std::vector<Object>& Geometry::get_objects() const
@@ -24,6 +29,11 @@ const InterpolatableData<Object>& Geometry::get_interpolatable_objects() const
 InterpolatableData<Object>& Geometry::get_interpolatable_objects()
 {
   return objects;
+}
+
+const std::vector<Material>& Geometry::get_materials() const
+{
+  return materials;
 }
 
 bool Geometry::intersect(const Ray& ray, HitInfo& hit_info) const
@@ -44,5 +54,5 @@ bool Geometry::intersect(const Ray& ray, HitInfo& hit_info) const
 
 Geometry interpolate(const Geometry& a, const Geometry& b, float weight)
 {
-  return Geometry(interpolate(a.get_interpolatable_objects(), b.get_interpolatable_objects(), weight));
+  return Geometry(interpolate(a.get_interpolatable_objects(), b.get_interpolatable_objects(), weight), a.get_materials());
 }
