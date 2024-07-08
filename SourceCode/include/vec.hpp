@@ -121,6 +121,14 @@ Vec<T1, N> operator*(const T2 a, const Vec<T1, N>& b)
   return operator*(b, a);
 }
 
+template<typename T1, typename T2, int N>
+Vec<T1, N> operator*(const Vec<T1, N>& a, const Vec<T2, N> b)
+{
+  T1 vals[N];
+  for (uint32_t i = 0; i < N; i++) vals[i] = a.values[i] * T1(b.values[i]);
+  return Vec<T1, N>(vals);
+}
+
 template<typename T, int N>
 float dot(const Vec<T, N>& a, const cm::Vec<T, N>& b)
 {
@@ -234,6 +242,24 @@ struct Vec<T, 3>
   T operator[](const T2 idx) const requires(std::is_integral<T2>::value)
   {
     return values[idx];
+  }
+
+  template<typename T2>
+  void operator*=(const T2 value)
+  {
+    *this = *this * value;
+  }
+
+  template<typename T2>
+  void operator/=(const T2 value)
+  {
+    *this = *this / value;
+  }
+
+  template<typename T2>
+  void operator+=(const T2 value)
+  {
+    *this = *this + value;
   }
 
   template<typename T2>

@@ -2,19 +2,18 @@
 
 #include <vector>
 #include "triangle.hpp"
+#include "hit_info.hpp"
 
 class Object
 {
 public:
   Object() = default;
-  Object(const std::vector<Triangle>& triangles, uint32_t id);
-  uint32_t get_id() const;
+  Object(const std::vector<Triangle>& triangles);
   const std::vector<Triangle>& get_triangles() const;
-  bool intersect(const Ray& ray, float& t, cm::Vec3& p) const;
+  bool intersect(const Ray& ray, HitInfo& hit_info) const;
 
 private:
   std::vector<Triangle> triangles;
-  uint32_t id;
 };
 
 Object interpolate(const Object& a, const Object& b, float weight);

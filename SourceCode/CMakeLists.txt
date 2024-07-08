@@ -8,6 +8,7 @@ set(SOURCE_FILES
   src/triangle.cpp
   src/object.cpp
   src/geometry.cpp
+  src/light.cpp
   src/scene.cpp
   src/renderer.cpp
   src/color.cpp
