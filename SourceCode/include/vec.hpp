@@ -122,7 +122,7 @@ Vec<T1, N> operator*(const T2 a, const Vec<T1, N>& b)
 }
 
 template<typename T1, typename T2, int N>
-Vec<T1, N> operator*(const Vec<T1, N>& a, const Vec<T2, N> b)
+Vec<T1, N> operator*(const Vec<T1, N>& a, const Vec<T2, N>& b)
 {
   T1 vals[N];
   for (uint32_t i = 0; i < N; i++) vals[i] = a.values[i] * T1(b.values[i]);
@@ -130,7 +130,7 @@ Vec<T1, N> operator*(const Vec<T1, N>& a, const Vec<T2, N> b)
 }
 
 template<typename T, int N>
-float dot(const Vec<T, N>& a, const cm::Vec<T, N>& b)
+float dot(const Vec<T, N>& a, const Vec<T, N>& b)
 {
   float result = 0.0;
   for (uint32_t i = 0; i < N; i++) result += a.values[i] * b.values[i];
@@ -151,6 +151,16 @@ Vec<T, N> normalize(const Vec<T, N>& a) requires(std::is_floating_point<T>::valu
   return a / length(a);
 }
 
+template<typename T, int N>
+bool operator==(const Vec<T, N>& a, const Vec<T, N>& b)
+{
+  for (uint32_t i = 0; i < N; i++)
+  {
+    if (a[i] != b[i]) return false;
+  }
+  return true;
+}
+
 template<typename T>
 Vec<T, 3> cross(const Vec<T, 3>& a, const Vec<T, 3>& b) requires(std::is_floating_point<T>::value)
 {
@@ -159,6 +169,12 @@ Vec<T, 3> cross(const Vec<T, 3>& a, const Vec<T, 3>& b) requires(std::is_floatin
   result.y = a.z * b.x - a.x * b.z;
   result.z = a.x * b.y - a.y * b.x;
   return result;
+}
+
+template<typename T>
+Vec<T, 3> reflect(const Vec<T, 3>& a, const Vec<T, 3>& b) requires(std::is_floating_point<T>::value)
+{
+  return a - 2.0 * cm::dot(a, b) * b;
 }
 
 template<typename T>
@@ -203,6 +219,9 @@ struct Vec<T, 2>
     T values[2];
     struct {
       T x, y;
+    };
+    struct {
+      T u, v;
     };
   };
 };

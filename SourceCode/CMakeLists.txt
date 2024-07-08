@@ -3,11 +3,13 @@ project(Chaos)
 set(CMAKE_CXX_STANDARD 20)
 
 set(SOURCE_FILES
+  src/spatial_configuration.cpp
   src/camera.cpp
   src/ray.cpp
   src/triangle.cpp
   src/object.cpp
   src/geometry.cpp
+  src/material.cpp
   src/light.cpp
   src/scene.cpp
   src/renderer.cpp

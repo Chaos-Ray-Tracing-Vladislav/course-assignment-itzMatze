@@ -1,7 +1,30 @@
 #include "object.hpp"
+#include "spatial_configuration.hpp"
 #include "triangle.hpp"
+#include "vec.hpp"
 
-Object::Object(const std::vector<Triangle>& triangles) : triangles(triangles)
+// only triangles are supported
+Object::Object(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const SpatialConfiguration& spatial_conf, int32_t material_idx, bool compute_normals) :
+  vertices(vertices), spatial_conf(spatial_conf), material_idx(material_idx)
+{
+  assert(indices.size() % 3 == 0);
+  for (uint32_t i = 0; i < indices.size(); i += 3)
+  {
+    triangles.emplace_back(indices[i], indices[i + 1], indices[i + 2], vertices);
+  }
+  if (compute_normals)
+  {
+    for (const auto& triangle : this->triangles) triangle.add_normal_to_vertices(this->vertices);
+    for (auto& vertex : this->vertices)
+    {
+      // make sure that any normals have been added to the vertex
+      if (cm::length(vertex.normal) > 0.0001) vertex.normal = cm::normalize(vertex.normal);
+    }
+  }
+}
+
+Object::Object(const std::vector<Vertex>& vertices, const std::vector<Triangle>& triangles, const SpatialConfiguration& spatial_conf, int32_t material_idx) :
+  vertices(vertices), triangles(triangles), spatial_conf(spatial_conf), material_idx(material_idx)
 {}
 
 const std::vector<Triangle>& Object::get_triangles() const
@@ -9,33 +32,48 @@ const std::vector<Triangle>& Object::get_triangles() const
   return triangles;
 }
 
+const std::vector<Vertex>& Object::get_vertices() const
+{
+  return vertices;
+}
+
+const SpatialConfiguration& Object::get_spatial_conf() const
+{
+  return spatial_conf;
+}
+
+SpatialConfiguration& Object::get_spatial_conf()
+{
+  return spatial_conf;
+}
+
 bool Object::intersect(const Ray& ray, HitInfo& hit_info) const
 {
   HitInfo cur_hit_info;
+  // transform ray into local coordinate system of object
+  const Ray transformed_ray(spatial_conf.inverse_transform_pos(ray.origin), spatial_conf.inverse_transform_dir(ray.dir));
   for (const auto& triangle : triangles)
   {
     // test if object is intersected and if yes whether the intersection is closer than the previous ones
-    if (triangle.intersect(ray, cur_hit_info) && (cur_hit_info.t < hit_info.t))
+    if (triangle.intersect(transformed_ray, cur_hit_info, vertices) && (cur_hit_info.t < hit_info.t))
     {
       hit_info = cur_hit_info;
     }
   }
   // if an intersection was found, t is the distance to this intersection instead of maximum float value
-  return (hit_info.t < std::numeric_limits<float>::max());
+  if (hit_info.t < std::numeric_limits<float>::max())
+  {
+    // transform normals
+    hit_info.geometric_normal = spatial_conf.transform_dir(hit_info.geometric_normal);
+    hit_info.normal = spatial_conf.transform_dir(hit_info.normal);
+    hit_info.material_idx = material_idx;
+    return true;
+  }
+  return false;
 }
 
 Object interpolate(const Object& a, const Object& b, float weight)
 {
-  std::vector<Triangle> triangles;
-  const std::vector<Triangle>& triangles_a = a.get_triangles();
-  const std::vector<Triangle>& triangles_b = b.get_triangles();
-  assert(triangles_a.size() == triangles_b.size());
-  for (uint32_t i = 0, j = 0; i < triangles_a.size() && j < triangles_b.size();)
-  {
-      // interpolate triangle
-      cm::Vec3 vertices[3];
-      for (uint32_t k = 0; k < 3; k++) vertices[k] = (1.0 - weight) * triangles_a[i].vertices[k] + weight * triangles_b[j].vertices[k];
-      triangles.emplace_back(Triangle(vertices[0], vertices[1], vertices[2]));
-  }
-  return Object(triangles);
+  SpatialConfiguration spatial_conf = interpolate(a.get_spatial_conf(), b.get_spatial_conf(), weight);
+  return Object(a.get_vertices(), a.get_triangles(), spatial_conf);
 }

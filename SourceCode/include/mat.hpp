@@ -42,6 +42,15 @@ struct Mat
       values[i++] = Vec<T, M>(column);
     }
   }
+  constexpr Mat(const std::initializer_list<cm::Vec3>& vals)
+  {
+    assert(vals.size() == M);
+    uint32_t i = 0;
+    for (const auto& column : vals)
+    {
+      values[i++] = column;
+    }
+  }
 
   template<typename T2>
   Vec<T, M>& operator[](const T2 idx) requires(std::is_integral<T2>::value)
@@ -145,6 +154,15 @@ inline Mat<float, 3, 3> rotate(Vec3 angles, bool use_radian = false)
     {(std::cos(angles.x) * std::sin(angles.y) * std::cos(angles.z)) + (std::sin(angles.x) * std::sin(angles.z)),
       (std::cos(angles.x) * std::sin(angles.y) * std::sin(angles.z)) - (std::sin(angles.x) * std::cos(angles.z)),
       std::cos(angles.x) * std::cos(angles.y)}};
+}
+
+inline Mat<float, 3, 3> look_at(const cm::Vec3& view_dir, const cm::Vec3& up = cm::Vec3(0.0, 1.0, 0.0))
+{
+  Mat<float, 3, 3> result;
+  result[2] = -view_dir;
+  result[0] = normalize(cross(up, result[2]));
+  result[1] = cross(result[2], result[0]);
+  return result;
 }
 
 using Mat3 = Mat<float, 3, 3>;
