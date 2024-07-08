@@ -1,40 +1,31 @@
 #include "object.hpp"
 #include "triangle.hpp"
 
-Object::Object(const std::vector<Triangle>& triangles, uint32_t id) : triangles(triangles), id(id)
+Object::Object(const std::vector<Triangle>& triangles) : triangles(triangles)
 {}
-
-uint32_t Object::get_id() const
-{
-  return id;
-}
 
 const std::vector<Triangle>& Object::get_triangles() const
 {
   return triangles;
 }
 
-bool Object::intersect(const Ray& ray, float& t, cm::Vec3& p) const
+bool Object::intersect(const Ray& ray, HitInfo& hit_info) const
 {
-  t = std::numeric_limits<float>::max();
-  float cur_t;
-  cm::Vec3 cur_p;
+  HitInfo cur_hit_info;
   for (const auto& triangle : triangles)
   {
     // test if object is intersected and if yes whether the intersection is closer than the previous ones
-    if (triangle.intersect(ray, cur_t, cur_p) && (cur_t < t))
+    if (triangle.intersect(ray, cur_hit_info) && (cur_hit_info.t < hit_info.t))
     {
-      t = cur_t;
-      p = cur_p;
+      hit_info = cur_hit_info;
     }
   }
   // if an intersection was found, t is the distance to this intersection instead of maximum float value
-  return (t < std::numeric_limits<float>::max());
+  return (hit_info.t < std::numeric_limits<float>::max());
 }
 
 Object interpolate(const Object& a, const Object& b, float weight)
 {
-  assert(a.get_id() == b.get_id());
   std::vector<Triangle> triangles;
   const std::vector<Triangle>& triangles_a = a.get_triangles();
   const std::vector<Triangle>& triangles_b = b.get_triangles();
@@ -46,5 +37,5 @@ Object interpolate(const Object& a, const Object& b, float weight)
       for (uint32_t k = 0; k < 3; k++) vertices[k] = (1.0 - weight) * triangles_a[i].vertices[k] + weight * triangles_b[j].vertices[k];
       triangles.emplace_back(Triangle(vertices[0], vertices[1], vertices[2]));
   }
-  return Object(triangles, a.get_id());
+  return Object(triangles);
 }
