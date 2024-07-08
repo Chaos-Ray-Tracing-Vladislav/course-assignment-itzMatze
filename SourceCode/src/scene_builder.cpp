@@ -11,19 +11,13 @@ SceneBuilder::SceneBuilder()
   camera_keyframes.push_back(std::make_shared<CameraConfig>());
 }
 
-SceneBuilder::SceneBuilder(const std::vector<Triangle>& triangles, const InterpolatableData<Light>& lights, const CameraConfig& cam_config)
-{
-  geometry_keyframes.emplace_back(std::make_shared<Geometry>(triangles));
-  light_keyframes.emplace_back(std::make_shared<InterpolatableData<Light>>(lights));
-  camera_keyframes.emplace_back(std::make_shared<CameraConfig>(cam_config));
-}
-
 void SceneBuilder::new_keyframe(uint32_t frame_count)
 {
   frame_counts.emplace_back(frame_count);
   // store next keyframe as pointer to last keyframe
   // copy keyframe in non-const getter because then the user wants to change it
   geometry_keyframes.emplace_back(geometry_keyframes.back());
+  light_keyframes.emplace_back(light_keyframes.back());
   camera_keyframes.emplace_back(camera_keyframes.back());
 }
 

@@ -12,7 +12,6 @@ class SceneBuilder
 {
 public:
   SceneBuilder();
-  SceneBuilder(const std::vector<Triangle>& triangles, const InterpolatableData<Light>& lights, const CameraConfig& cam_config = CameraConfig());
 
   void new_keyframe(uint32_t frame_count /* number of frames between previous and new keyframe */);
 

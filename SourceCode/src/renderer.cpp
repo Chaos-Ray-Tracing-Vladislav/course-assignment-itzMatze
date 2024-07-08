@@ -36,34 +36,49 @@ std::vector<Color> Renderer::render_frame()
   {
     for (uint32_t x = 0; x < resolution.x; x++)
     {
-      if (scene.get_geometry().intersect(scene.get_camera().get_ray(get_camera_coordinates({x, y})), hit_info))
+      Ray ray = scene.get_camera().get_ray(get_camera_coordinates({x, y}));
+      Color color(0.0, 0.0, 0.0);
+      cm::Vec3 throughput(1.0, 1.0, 1.0);
+      for (uint32_t i = 0; i < 16; i++)
       {
-        constexpr cm::Vec3 albedo = cm::Vec3(0.99, 0.01, 0.55);
-        if (scene.get_lights().size() > 0)
+        if (scene.get_geometry().intersect(ray, hit_info))
         {
-          cm::Vec3 color(0.0, 0.0, 0.0);
-          for (const auto& light : scene.get_lights())
+#if 0
+          // barycentric coordinates debug visualization
+          color = Color(hit_info.bary.u, hit_info.bary.v, 1.0);
+          break;
+#elif 0
+          // normal debug visualization
+          color = Color((hit_info.normal + 1.0) / 2.0);
+          break;
+#else
+          Material material = (hit_info.material_idx == -1) ? Material() : scene.get_geometry().get_materials()[hit_info.material_idx];
+          // if material is dirac delta reflective or there are no lights there is no need to evaluate lighting
+          if (!material.is_delta() && scene.get_lights().size() > 0)
           {
-            cm::Vec3 contribution = cm::Vec3(light.get_intensity());
-            contribution *= std::max(0.0f, cm::dot(hit_info.normal, cm::normalize(light.get_position() - hit_info.pos)));
-            contribution /= cm::length(light.get_position() - hit_info.pos);
-            contribution *= albedo;
-            color += contribution;
+            for (const auto& light : scene.get_lights())
+            {
+              const cm::Vec3 outgoing_dir = cm::normalize(light.get_position() - hit_info.pos);
+              cm::Vec3 contribution = cm::Vec3(light.get_intensity());
+              contribution *= throughput * material.eval(hit_info, ray.dir, outgoing_dir);
+              contribution /= cm::length(light.get_position() - hit_info.pos);
+              color.value += contribution;
+            }
           }
-          pixels[y * resolution.x + x] = Color(color);
+          ray.origin = hit_info.pos;
+          cm::Vec3 attenuation;
+          if (!material.sample_dir(hit_info, ray.dir, ray.dir, attenuation)) break;
+          throughput *= attenuation;
+#endif
         }
         else
         {
-          // reduce color intensity with distance to visualize object distance in image
-          float intensity = std::max(1.0 - (hit_info.t / 40.0), 0.0);
-          pixels[y * resolution.x + x] = Color(intensity, 0.0, intensity);
+          // background color
+          color.value += scene.get_background_color().value * throughput;
+          break;
         }
       }
-      else
-      {
-        // background color
-        pixels[y * resolution.x + x] = scene.get_background_color();
-      }
+      pixels[y * resolution.x + x] = color;
     }
   }
   return pixels;
