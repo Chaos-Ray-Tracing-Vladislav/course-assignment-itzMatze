@@ -1,6 +1,6 @@
 #include "renderer.hpp"
 #include "color.hpp"
-#include "file_handler.hpp"
+#include "image_file_handler.hpp"
 #include "random_generator.hpp"
 
 void Renderer::init(const Scene& scene, const cm::Vec2u resolution, const std::string& name)
@@ -40,13 +40,13 @@ std::vector<Color> Renderer::render_frame()
       if (scene.get_geometry().intersect(scene.get_camera().get_ray(get_camera_coordinates({x, y})), t, p))
       {
         // reduce color intensity with distance to visualize object distance in image
-        float intensity = std::max(1.0 - (t / 10.0), 0.0);
+        float intensity = std::max(1.0 - (t / 40.0), 0.0);
         pixels[y * resolution.x + x] = Color(intensity, 0.0, intensity);
       }
       else
       {
         // background color
-        pixels[y * resolution.x + x] = Color(0.0, 0.0, 0.2);
+        pixels[y * resolution.x + x] = scene.get_background_color();
       }
     }
   }

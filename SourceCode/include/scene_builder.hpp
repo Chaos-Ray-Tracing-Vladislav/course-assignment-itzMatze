@@ -4,6 +4,7 @@
 #include "geometry.hpp"
 #include "camera.hpp"
 #include "scene.hpp"
+#include "color.hpp"
 
 class SceneBuilder
 {
@@ -19,11 +20,13 @@ public:
   const CameraConfig& get_camera() const;
   CameraConfig& get_camera();
 
+  void set_background(const Color& color);
   Scene build_scene();
 
 private:
   std::vector<std::shared_ptr<Geometry>> geometry_keyframes;
   std::vector<std::shared_ptr<CameraConfig>> camera_keyframes;
   std::vector<uint32_t> frame_counts;
+  Color background_color;
 };
 

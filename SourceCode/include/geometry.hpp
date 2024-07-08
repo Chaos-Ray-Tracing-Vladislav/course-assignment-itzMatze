@@ -3,13 +3,7 @@
 #include "triangle.hpp"
 #include "ray.hpp"
 #include "vec.hpp"
-
-// currently an object consists only of a single triangle
-struct Object
-{
-  Triangle triangle;
-  uint32_t id;
-};
+#include "object.hpp"
 
 class Geometry
 {
@@ -17,7 +11,8 @@ public:
   Geometry() = default;
   Geometry(const std::vector<Triangle>& triangles);
   void add_triangle(const Triangle& triangle);
-  void add_triangles(const std::vector<Triangle>& triangles);
+  void add_new_object(const std::vector<Triangle>& triangles);
+  void add_object_with_id(const Object& object);
   const std::vector<Object>& get_objects() const;
   bool intersect(const Ray& ray, float& t, cm::Vec3& p) const;
 

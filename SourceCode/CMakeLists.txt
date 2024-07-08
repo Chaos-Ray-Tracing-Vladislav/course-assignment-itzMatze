@@ -6,6 +6,7 @@ set(SOURCE_FILES
   src/camera.cpp
   src/ray.cpp
   src/triangle.cpp
+  src/object.cpp
   src/geometry.cpp
   src/scene.cpp
   src/renderer.cpp
@@ -14,12 +15,12 @@ set(SOURCE_FILES
   src/image_factory.cpp
   src/scene_factory.cpp
   src/scene_builder.cpp
-  src/file_handler.cpp
+  src/image_file_handler.cpp
+  src/scene_file_handler.cpp
   dependencies/stb/stb_image_write.cpp)
 
 add_executable(Chaos src/main.cpp ${SOURCE_FILES})
-target_include_directories(Chaos PRIVATE
-  "${PROJECT_SOURCE_DIR}/include"
+target_include_directories(Chaos PRIVATE "${PROJECT_SOURCE_DIR}/include"
   "${PROJECT_SOURCE_DIR}/dependencies/")
 
 add_executable(hw04 src/hw04.cpp)

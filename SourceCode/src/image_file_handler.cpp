@@ -1,8 +1,8 @@
-#include "file_handler.hpp"
+#include "image_file_handler.hpp"
 #include <ctime>
 #include <fstream>
 #include <filesystem>
-#include "stb_image_write.h"
+#include "stb/stb_image_write.h"
 
 void write_image(const std::vector<Color>& pixels, std::string image_path, const cm::Vec2u resolution, FileType type)
 {
@@ -39,6 +39,11 @@ void write_image(const std::vector<Color>& pixels, std::string image_path, const
 void save_single_image(const std::vector<Color>& pixels, const std::string& name, const cm::Vec2u resolution, FileType type)
 {
   std::string image_path("../../Images/" + name);
+  std::filesystem::path path(image_path);
+  std::filesystem::path dir = path.parent_path();
+  if (!dir.empty() && !std::filesystem::exists(dir)) {
+    std::filesystem::create_directories(dir);
+  }
   if (!name.empty())
   {
     image_path.append("_");

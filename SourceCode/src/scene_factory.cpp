@@ -86,7 +86,7 @@ Scene create_pyramid_star_scene()
   }
 
   // star
-  scene_builder.get_geometry().add_triangles(add_star(cm::Vec3(0.0, 0.5, -4.0), 0.1, 0.5, 5));
+  scene_builder.get_geometry().add_new_object(add_star(cm::Vec3(0.0, 0.5, -4.0), 0.1, 0.5, 5));
 
   scene_builder.new_keyframe(30);
   scene_builder.get_camera().set_origin(cm::Vec3(-4.0, 0.0, 1.0));
