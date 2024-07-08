@@ -19,9 +19,9 @@ void Triangle::add_normal_to_vertices(std::vector<Vertex>& vertices) const
 
 bool Triangle::intersect(const Ray& ray, HitInfo& hit_info, const std::vector<Vertex>& vertices) const
 {
-  const Vertex v0 = vertices[vertex_indices[0]];
-  const Vertex v1 = vertices[vertex_indices[1]];
-  const Vertex v2 = vertices[vertex_indices[2]];
+  const Vertex& v0 = vertices[vertex_indices[0]];
+  const Vertex& v1 = vertices[vertex_indices[1]];
+  const Vertex& v2 = vertices[vertex_indices[2]];
   const float dot_n_dir = cm::dot(ray.dir, geometric_normal);
   // backface culling
   if (dot_n_dir >= 0.0) return false;

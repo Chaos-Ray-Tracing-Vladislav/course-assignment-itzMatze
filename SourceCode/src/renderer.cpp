@@ -40,7 +40,7 @@ std::vector<Color> Renderer::render_frame()
       {
 #if 0
         // barycentric coordinates debug visualization
-        pixels[y * resolution.x + x] = Color(hit_info.bary.x, hit_info.bary.y, 1.0);
+        pixels[y * resolution.x + x] = Color(hit_info.bary.u, hit_info.bary.v, 1.0);
 #elif 1
         // normal debug visualization
         pixels[y * resolution.x + x] = Color((hit_info.normal + 1.0) / 2.0);

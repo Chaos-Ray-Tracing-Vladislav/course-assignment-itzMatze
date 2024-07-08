@@ -1,6 +1,11 @@
 #include "spatial_configuration.hpp"
 #include "quat.hpp"
 
+SpatialConfiguration::SpatialConfiguration() : orientation(cm::Quatf(1.0, 0.0, 0.0, 0.0)), position(cm::Vec3(0.0, 0.0, 0.0))
+{
+  update_coordinate_system();
+}
+
 SpatialConfiguration::SpatialConfiguration(const cm::Mat3& orientation, const cm::Vec3& position) : orientation(cm::quat_cast(orientation)), position(position)
 {
   update_coordinate_system();
@@ -79,6 +84,32 @@ cm::Vec3 SpatialConfiguration::get_y_axis() const
 cm::Vec3 SpatialConfiguration::get_z_axis() const
 {
   return local_z_axis;
+}
+
+cm::Vec3 SpatialConfiguration::transform_pos(const cm::Vec3& pos) const
+{
+  const cm::Quatf quat_pos = orientation * cm::Quatf(0.0, pos.x, pos.y, pos.z) * cm::conjugate(orientation);
+  const cm::Vec3 result = cm::Vec3(quat_pos.x, quat_pos.y, quat_pos.z) + position;
+  return result;
+}
+
+cm::Vec3 SpatialConfiguration::transform_dir(const cm::Vec3& dir) const
+{
+  const cm::Quatf quat_dir = orientation * cm::Quatf(0.0, dir.x, dir.y, dir.z) * cm::conjugate(orientation);
+  return cm::Vec3(quat_dir.x, quat_dir.y, quat_dir.z);
+}
+
+cm::Vec3 SpatialConfiguration::inverse_transform_pos(const cm::Vec3& pos) const
+{
+  const cm::Vec3 new_pos = pos - position;
+  const cm::Quatf quat_pos = cm::conjugate(orientation) * cm::Quatf(0.0, new_pos.x, new_pos.y, new_pos.z) * orientation;
+  return cm::Vec3(quat_pos.x, quat_pos.y, quat_pos.z);
+}
+
+cm::Vec3 SpatialConfiguration::inverse_transform_dir(const cm::Vec3& dir) const
+{
+  const cm::Quatf quat_dir = cm::conjugate(orientation) * cm::Quatf(0.0, dir.x, dir.y, dir.z) * orientation;
+  return cm::Vec3(quat_dir.x, quat_dir.y, quat_dir.z);
 }
 
 SpatialConfiguration interpolate(const SpatialConfiguration& a, const SpatialConfiguration& b, float weight)

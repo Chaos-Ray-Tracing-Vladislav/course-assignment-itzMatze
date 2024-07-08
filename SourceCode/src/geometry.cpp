@@ -6,9 +6,9 @@
 Geometry::Geometry(const InterpolatableData<Object>& objects) : objects(objects)
 {}
 
-void Geometry::add_object(const Object& object)
+uint32_t Geometry::add_object(const Object& object)
 {
-  objects.add_new_data(object);
+  return objects.add_new_data(object);
 }
 
 const std::vector<Object>& Geometry::get_objects() const
@@ -17,6 +17,11 @@ const std::vector<Object>& Geometry::get_objects() const
 }
 
 const InterpolatableData<Object>& Geometry::get_interpolatable_objects() const
+{
+  return objects;
+}
+
+InterpolatableData<Object>& Geometry::get_interpolatable_objects()
 {
   return objects;
 }

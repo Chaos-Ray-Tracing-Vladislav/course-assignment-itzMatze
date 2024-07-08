@@ -11,6 +11,7 @@ constexpr cm::Vec3 z_axis(0.0, 0.0, 1.0);
 class SpatialConfiguration
 {
 public:
+  SpatialConfiguration();
   SpatialConfiguration(const cm::Mat3& orientation, const cm::Vec3& position);
   SpatialConfiguration(const cm::Quatf& orientation, const cm::Vec3& position);
   void translate(const cm::Vec3& translation);
@@ -24,6 +25,10 @@ public:
   cm::Vec3 get_x_axis() const;
   cm::Vec3 get_y_axis() const;
   cm::Vec3 get_z_axis() const;
+  cm::Vec3 transform_pos(const cm::Vec3& pos) const;
+  cm::Vec3 transform_dir(const cm::Vec3& dir) const;
+  cm::Vec3 inverse_transform_pos(const cm::Vec3& pos) const;
+  cm::Vec3 inverse_transform_dir(const cm::Vec3& dir) const;
 
 private:
   cm::Quatf orientation;

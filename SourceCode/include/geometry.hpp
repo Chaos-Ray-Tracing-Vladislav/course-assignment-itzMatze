@@ -10,7 +10,8 @@ class Geometry
 public:
   Geometry() = default;
   Geometry(const InterpolatableData<Object>& objects);
-  void add_object(const Object& object);
+  uint32_t add_object(const Object& object);
+  InterpolatableData<Object>& get_interpolatable_objects();
   const InterpolatableData<Object>& get_interpolatable_objects() const;
   const std::vector<Object>& get_objects() const;
   bool intersect(const Ray& ray, HitInfo& hit_info) const;

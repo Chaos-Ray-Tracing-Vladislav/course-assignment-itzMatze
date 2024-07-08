@@ -1,10 +1,13 @@
 #include "object.hpp"
+#include "spatial_configuration.hpp"
 #include "triangle.hpp"
 #include "vec.hpp"
 
 // only triangles are supported
-Object::Object(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, bool compute_normals) : vertices(vertices)
+Object::Object(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const SpatialConfiguration& spatial_conf, bool compute_normals) :
+  vertices(vertices), spatial_conf(spatial_conf)
 {
+  assert(indices.size() % 3 == 0);
   for (uint32_t i = 0; i < indices.size(); i += 3)
   {
     triangles.emplace_back(indices[i], indices[i + 1], indices[i + 2], vertices);
@@ -20,6 +23,10 @@ Object::Object(const std::vector<Vertex>& vertices, const std::vector<uint32_t>&
   }
 }
 
+Object::Object(const std::vector<Vertex>& vertices, const std::vector<Triangle>& triangles, const SpatialConfiguration& spatial_conf) :
+  vertices(vertices), triangles(triangles), spatial_conf(spatial_conf)
+{}
+
 const std::vector<Triangle>& Object::get_triangles() const
 {
   return triangles;
@@ -30,23 +37,42 @@ const std::vector<Vertex>& Object::get_vertices() const
   return vertices;
 }
 
+const SpatialConfiguration& Object::get_spatial_conf() const
+{
+  return spatial_conf;
+}
+
+SpatialConfiguration& Object::get_spatial_conf()
+{
+  return spatial_conf;
+}
+
 bool Object::intersect(const Ray& ray, HitInfo& hit_info) const
 {
   HitInfo cur_hit_info;
+  // transform ray into local coordinate system of object
+  const Ray transformed_ray(spatial_conf.inverse_transform_pos(ray.origin), spatial_conf.inverse_transform_dir(ray.dir));
   for (const auto& triangle : triangles)
   {
     // test if object is intersected and if yes whether the intersection is closer than the previous ones
-    if (triangle.intersect(ray, cur_hit_info, vertices) && (cur_hit_info.t < hit_info.t))
+    if (triangle.intersect(transformed_ray, cur_hit_info, vertices) && (cur_hit_info.t < hit_info.t))
     {
       hit_info = cur_hit_info;
     }
   }
   // if an intersection was found, t is the distance to this intersection instead of maximum float value
-  return (hit_info.t < std::numeric_limits<float>::max());
+  if (hit_info.t < std::numeric_limits<float>::max())
+  {
+    // transform normals
+    hit_info.geometric_normal = spatial_conf.transform_dir(hit_info.geometric_normal);
+    hit_info.normal = spatial_conf.transform_dir(hit_info.normal);
+    return true;
+  }
+  return false;
 }
 
 Object interpolate(const Object& a, const Object& b, float weight)
 {
-  // TODO(Matze): use spatial configuration to interpolate geometry positions
-  return a;
+  SpatialConfiguration spatial_conf = interpolate(a.get_spatial_conf(), b.get_spatial_conf(), weight);
+  return Object(a.get_vertices(), a.get_triangles(), spatial_conf);
 }

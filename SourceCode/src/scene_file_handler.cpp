@@ -75,7 +75,7 @@ int load_scene_file(const std::string& file_path, SceneFile& scene_file)
     {
       indices.emplace_back(rj_indices[i].GetInt());
     }
-    scene_builder.get_geometry().add_object(Object(vertices, indices, true));
+    scene_builder.get_geometry().add_object(Object(vertices, indices, SpatialConfiguration(), true));
   }
 
   scene_builder.get_camera().set_focal_length(0.012);
