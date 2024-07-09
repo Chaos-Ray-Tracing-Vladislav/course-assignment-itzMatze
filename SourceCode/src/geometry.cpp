@@ -37,7 +37,7 @@ const std::vector<Material>& Geometry::get_materials() const
 
 bool Geometry::intersect(const Ray& ray, HitInfo& hit_info) const
 {
-  hit_info.t = std::numeric_limits<float>::max();
+  hit_info.t = ray.config.max_t;
   HitInfo cur_hit_info;
   for (const auto& object : objects.get_data())
   {
@@ -45,11 +45,11 @@ bool Geometry::intersect(const Ray& ray, HitInfo& hit_info) const
     if (object.intersect(ray, cur_hit_info) && (cur_hit_info.t < hit_info.t))
     {
       hit_info = cur_hit_info;
-      if (ray.anyhit) return true;
+      if (ray.config.anyhit) return true;
     }
   }
   // if an intersection was found, t is the distance to this intersection instead of maximum float value
-  return (hit_info.t < ray.max_t);
+  return (hit_info.t < ray.config.max_t);
 }
 
 Geometry interpolate(const Geometry& a, const Geometry& b, float weight)

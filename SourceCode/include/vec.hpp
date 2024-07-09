@@ -130,6 +130,16 @@ Vec<T1, N> operator*(const Vec<T1, N>& a, const Vec<T2, N>& b)
 }
 
 template<typename T, int N>
+bool operator==(const Vec<T, N>& a, const Vec<T, N>& b)
+{
+  for (uint32_t i = 0; i < N; i++)
+  {
+    if (a[i] != b[i]) return false;
+  }
+  return true;
+}
+
+template<typename T, int N>
 float dot(const Vec<T, N>& a, const Vec<T, N>& b)
 {
   float result = 0.0;
@@ -149,16 +159,6 @@ template<typename T, int N>
 Vec<T, N> normalize(const Vec<T, N>& a) requires(std::is_floating_point<T>::value)
 {
   return a / length(a);
-}
-
-template<typename T, int N>
-bool operator==(const Vec<T, N>& a, const Vec<T, N>& b)
-{
-  for (uint32_t i = 0; i < N; i++)
-  {
-    if (a[i] != b[i]) return false;
-  }
-  return true;
 }
 
 template<typename T>

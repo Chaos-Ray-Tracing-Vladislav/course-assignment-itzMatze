@@ -51,18 +51,18 @@ bool Object::intersect(const Ray& ray, HitInfo& hit_info) const
 {
   HitInfo cur_hit_info;
   // transform ray into local coordinate system of object
-  const Ray transformed_ray(spatial_conf.inverse_transform_pos(ray.origin), spatial_conf.inverse_transform_dir(ray.dir));
+  const Ray transformed_ray(spatial_conf.inverse_transform_pos(ray.origin), spatial_conf.inverse_transform_dir(ray.dir), ray.config);
   for (const auto& triangle : triangles)
   {
     // test if object is intersected and if yes whether the intersection is closer than the previous ones
     if (triangle.intersect(transformed_ray, cur_hit_info, vertices) && (cur_hit_info.t < hit_info.t))
     {
       hit_info = cur_hit_info;
-      if (ray.anyhit) return true;
+      if (ray.config.anyhit) return true;
     }
   }
   // if an intersection was found, t is the distance to this intersection instead of maximum float value
-  if (hit_info.t < ray.max_t)
+  if (hit_info.t < ray.config.max_t)
   {
     // transform normals
     hit_info.geometric_normal = spatial_conf.transform_dir(hit_info.geometric_normal);

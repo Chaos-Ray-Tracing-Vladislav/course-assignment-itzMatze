@@ -28,7 +28,7 @@ void Renderer::render()
   }
 }
 
-std::vector<Color> Renderer::render_frame()
+std::vector<Color> Renderer::render_frame() const
 {
   std::vector<Color> pixels(resolution.x * resolution.y);
   HitInfo hit_info;
@@ -59,12 +59,14 @@ std::vector<Color> Renderer::render_frame()
             for (const auto& light : scene.get_lights())
             {
               const cm::Vec3 outgoing_dir = cm::normalize(light.get_position() - hit_info.pos);
+              const float light_distance = cm::length(light.get_position() - hit_info.pos);
               // trace shadow ray with small offset in the direction of the normal to avoid shadow acne
-              const Ray shadow_ray(hit_info.pos + 0.01 * hit_info.geometric_normal, outgoing_dir, cm::length(light.get_position() - hit_info.pos), true);
-              if (scene.get_geometry().intersect(shadow_ray, hit_info)) continue;
-              cm::Vec3 contribution = cm::Vec3(light.get_intensity());
+              const Ray shadow_ray(hit_info.pos + 0.0001 * hit_info.geometric_normal, outgoing_dir, RayConfig{.max_t = light_distance, .anyhit = true, .backface_culling = false});
+              HitInfo shadow_hit_info;
+              if (scene.get_geometry().intersect(shadow_ray, shadow_hit_info)) continue;
+              const float light_surface = 4.0 * M_PI * light_distance * light_distance;
+              cm::Vec3 contribution = cm::Vec3(light.get_intensity() / light_surface);
               contribution *= throughput * material.eval(hit_info, ray.dir, outgoing_dir);
-              contribution /= cm::length(light.get_position() - hit_info.pos);
               color.value += contribution;
             }
           }
@@ -87,7 +89,7 @@ std::vector<Color> Renderer::render_frame()
   return pixels;
 }
 
-cm::Vec2 Renderer::get_camera_coordinates(cm::Vec2u pixel)
+cm::Vec2 Renderer::get_camera_coordinates(cm::Vec2u pixel) const
 {
   // offset to either get a random position inside of the pixel square or the center of the pixel
   cm::Vec2 offset = use_jittering ? cm::Vec2(rng::random_float(), rng::random_float()) : cm::Vec2(0.5);
