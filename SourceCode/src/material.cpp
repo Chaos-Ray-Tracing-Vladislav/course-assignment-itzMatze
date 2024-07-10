@@ -1,4 +1,5 @@
 #include "material.hpp"
+#include "ray.hpp"
 #include "vec.hpp"
 
 Material::Material() : type(MaterialType::Diffuse)
@@ -28,7 +29,7 @@ std::vector<BSDFSample> Material::get_bsdf_samples(const HitInfo& hit_info, cons
   std::vector<BSDFSample> samples;
   if (is_delta() && type == MaterialType::Reflective)
   {
-    BSDFSample sample(Ray(hit_info.pos + 0.001 * normal, cm::reflect(incident_dir, normal)));
+    BSDFSample sample(Ray(hit_info.pos + RAY_START_OFFSET * normal, cm::reflect(incident_dir, normal)));
     sample.attenuation = params.albedo;
     samples.push_back(sample);
   }
@@ -45,10 +46,10 @@ std::vector<BSDFSample> Material::get_bsdf_samples(const HitInfo& hit_info, cons
       ref_idx_two = 1.0;
     }
     float fresnel = fresnel_schlick(cm::dot(-incident_dir, normal), ref_idx_one, ref_idx_two);
-    // disable backface culling if the ray might be inside of a transmissive object
-    BSDFSample refraction_sample(Ray(hit_info.pos - 0.001 * normal, cm::refract(incident_dir, normal, ref_idx_one / ref_idx_two), RayConfig{.backface_culling = false}));
+    // disable backface culling inside of the transmissive object
+    BSDFSample refraction_sample(Ray(hit_info.pos - RAY_START_OFFSET * normal, cm::refract(incident_dir, normal, ref_idx_one / ref_idx_two), RayConfig{.backface_culling = false}));
     refraction_sample.attenuation = cm::Vec3(1.0 - fresnel);
-    BSDFSample reflection_sample(Ray(hit_info.pos + 0.001 * normal, cm::reflect(incident_dir, normal), RayConfig{.backface_culling = false}));
+    BSDFSample reflection_sample(Ray(hit_info.pos + RAY_START_OFFSET * normal, cm::reflect(incident_dir, normal), RayConfig{.backface_culling = false}));
     reflection_sample.attenuation = cm::Vec3(fresnel);
     // refract returns a zero vector for total internal reflection
     if (cm::dot(refraction_sample.ray.dir, refraction_sample.ray.dir) > 0.1) samples.push_back(refraction_sample);

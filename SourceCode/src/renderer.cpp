@@ -74,7 +74,7 @@ std::vector<Color> Renderer::render_frame() const
               const cm::Vec3 outgoing_dir = cm::normalize(light.get_position() - hit_info.pos);
               const float light_distance = cm::length(light.get_position() - hit_info.pos);
               // trace shadow ray with small offset in the direction of the normal to avoid shadow acne
-              const Ray shadow_ray(hit_info.pos + 0.0001 * hit_info.geometric_normal, outgoing_dir, RayConfig{.max_t = light_distance, .anyhit = true, .backface_culling = false});
+              const Ray shadow_ray(hit_info.pos + RAY_START_OFFSET * hit_info.geometric_normal, outgoing_dir, RayConfig{.max_t = light_distance, .anyhit = true, .backface_culling = false});
               HitInfo shadow_hit_info;
               if (scene.get_geometry().intersect(shadow_ray, shadow_hit_info)) continue;
               const float light_surface = 4.0 * M_PI * light_distance * light_distance;
