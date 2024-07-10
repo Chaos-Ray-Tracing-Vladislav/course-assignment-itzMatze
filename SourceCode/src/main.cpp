@@ -20,7 +20,7 @@ int main(int argc, char** argv)
   for (uint32_t i = 0; i < 9; i++)
   {
     std::string file("11/scene" + std::to_string(i) + ".crtscene");
-    if (load_scene_file(file, scene_file)) return 1;
+    if (load_scene_file(file, scene_file) != 0) return 1;
     renderer.init(scene_file.scene, scene_file.settings.resolution, file);
     renderer.render();
   }
