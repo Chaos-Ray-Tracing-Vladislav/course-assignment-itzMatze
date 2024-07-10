@@ -1,12 +1,12 @@
 #include <string>
 #include <vector>
 
-#include "vec.hpp"
-#include "color.hpp"
-#include "image_factory.hpp"
-#include "scene_factory.hpp"
-#include "scene_file_handler.hpp"
-#include "renderer.hpp"
+#include "image/image_factory.hpp"
+#include "renderer/color.hpp"
+#include "renderer/renderer.hpp"
+#include "scene/scene_factory.hpp"
+#include "scene/scene_file_handler.hpp"
+#include "util/vec.hpp"
 
 static constexpr cm::Vec2u resolution(1920, 1080);
 
