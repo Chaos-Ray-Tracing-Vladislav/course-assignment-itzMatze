@@ -16,7 +16,7 @@ public:
   void set_sensor_size(float new_sensor_size);
 
 private:
-  SpatialConfiguration spat_conf;
+  SpatialConfiguration spatial_conf;
   float focal_length;
   // sensor is quadratic
   float sensor_size;
@@ -39,7 +39,7 @@ public:
   Ray get_ray(const cm::Vec2 pixel) const;
 
 private:
-  SpatialConfiguration spat_conf;
+  SpatialConfiguration spatial_conf;
   // position of the camera sensor
   cm::Vec3 upper_left_corner;
   // sensor is quadratic

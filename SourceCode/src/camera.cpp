@@ -5,14 +5,14 @@
 #include "vec.hpp"
 
 CameraConfig::CameraConfig() :
-  spat_conf(cm::rotate(cm::Vec3(0.0, 0.0, 0.0)), cm::Vec3(0.0, 0.0, 0.0)),
+  spatial_conf(cm::rotate(cm::Vec3(0.0, 0.0, 0.0)), cm::Vec3(0.0, 0.0, 0.0)),
   focal_length(0.03) /* 30mm camera lens */,
   sensor_size(0.036) /* standard full frame sensor width 36mm */
 {}
 
-SpatialConfiguration& CameraConfig::get_spatial_conf() { return spat_conf; }
+SpatialConfiguration& CameraConfig::get_spatial_conf() { return spatial_conf; }
 
-const SpatialConfiguration& CameraConfig::get_spatial_conf() const { return spat_conf; }
+const SpatialConfiguration& CameraConfig::get_spatial_conf() const { return spatial_conf; }
 
 float CameraConfig::get_focal_length() const { return focal_length; }
 
@@ -32,14 +32,14 @@ CameraConfig interpolate(const CameraConfig& a, const CameraConfig& b, float wei
 }
 
 Camera::Camera(const CameraConfig& config)
-  : spat_conf(config.get_spatial_conf()), sensor_size(config.get_sensor_size())
+  : spatial_conf(config.get_spatial_conf()), sensor_size(config.get_sensor_size())
 {
   // camera coordinate system
-  upper_left_corner = spat_conf.get_position() + (sensor_size / 2.0) * spat_conf.get_y_axis() - (sensor_size / 2.0) * spat_conf.get_x_axis() - config.get_focal_length() * spat_conf.get_z_axis();
+  upper_left_corner = spatial_conf.get_position() + (sensor_size / 2.0) * spatial_conf.get_y_axis() - (sensor_size / 2.0) * spatial_conf.get_x_axis() - config.get_focal_length() * spatial_conf.get_z_axis();
 }
 
 Ray Camera::get_ray(const cm::Vec2 pixel) const
 {
-  const cm::Vec3 pixel_pos = upper_left_corner + (pixel.x * sensor_size * spat_conf.get_x_axis()) - (pixel.y * sensor_size * spat_conf.get_y_axis());
-  return Ray(spat_conf.get_position(), pixel_pos - spat_conf.get_position());
+  const cm::Vec3 pixel_pos = upper_left_corner + (pixel.x * sensor_size * spatial_conf.get_x_axis()) - (pixel.y * sensor_size * spatial_conf.get_y_axis());
+  return Ray(spatial_conf.get_position(), pixel_pos - spatial_conf.get_position());
 }
