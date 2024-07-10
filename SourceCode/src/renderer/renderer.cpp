@@ -64,6 +64,10 @@ std::vector<Color> Renderer::render_frame() const
           // normal debug visualization
           color = Color((hit_info.normal + 1.0) / 2.0);
           break;
+#elif 0
+          // texture coordinates debug visualization
+          color = Color(hit_info.tex_coords.u, hit_info.tex_coords.v, 1.0);
+          break;
 #else
           Material material = (hit_info.material_idx == -1) ? Material() : scene.get_geometry().get_materials()[hit_info.material_idx];
           // if material is dirac delta reflective or there are no lights there is no need to evaluate lighting
