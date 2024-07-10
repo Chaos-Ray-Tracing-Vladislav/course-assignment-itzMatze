@@ -161,6 +161,14 @@ Vec<T, N> normalize(const Vec<T, N>& a) requires(std::is_floating_point<T>::valu
   return a / length(a);
 }
 
+template<typename T1, typename T2, int N>
+Vec<T1, N> pow(const Vec<T1, N>& a, const T2 b)
+{
+  Vec<T1, N> result;
+  for (uint32_t i = 0; i < N; i++) result[i] = std::pow(a[i], T1(b));
+  return result;
+}
+
 template<typename T>
 Vec<T, 3> cross(const Vec<T, 3>& a, const Vec<T, 3>& b) requires(std::is_floating_point<T>::value)
 {
@@ -172,9 +180,17 @@ Vec<T, 3> cross(const Vec<T, 3>& a, const Vec<T, 3>& b) requires(std::is_floatin
 }
 
 template<typename T>
-Vec<T, 3> reflect(const Vec<T, 3>& a, const Vec<T, 3>& b) requires(std::is_floating_point<T>::value)
+Vec<T, 3> reflect(const Vec<T, 3>& incident_dir, const Vec<T, 3>& normal) requires(std::is_floating_point<T>::value)
 {
-  return a - 2.0 * cm::dot(a, b) * b;
+  return incident_dir - 2.0 * cm::dot(incident_dir, normal) * normal;
+}
+
+template<typename T>
+Vec<T, 3> refract(const Vec<T, 3>& incident_dir, const Vec<T, 3>& normal, T eta) requires(std::is_floating_point<T>::value)
+{
+  const T k = 1.0 - eta * eta * (1.0 - dot(incident_dir, normal) * dot(incident_dir, normal));
+  if (k < 0.0) return Vec<T, 3>(0.0);
+  else return eta * incident_dir - (eta * dot(incident_dir, normal) + std::sqrt(k)) * normal;
 }
 
 template<typename T>

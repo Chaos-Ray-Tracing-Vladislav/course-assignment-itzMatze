@@ -65,12 +65,15 @@ int load_scene_file(const std::string& file_path, SceneFile& scene_file)
     const auto& rj_materials = doc["materials"].GetArray();
     for (const auto& material : rj_materials)
     {
-      cm::Vec3 albedo = get_vec3(material["albedo"]);
-      bool smooth_shading = material["smooth_shading"].GetBool();
+      MaterialParameters mat_params;
+      if (material.HasMember("albedo")) mat_params.albedo = get_vec3(material["albedo"]);
+      if (material.HasMember("ior")) mat_params.ior = material["ior"].GetFloat();
+      if (material.HasMember("smooth_shading")) mat_params.smooth_shading = material["smooth_shading"].GetBool();
       MaterialType type;
-      if (std::string("diffuse") == material["type"].GetString()) type = MaterialType::Diffuse;
+      if (std::string("diffuse") == material["type"].GetString() || std::string("constant") == material["type"].GetString()) type = MaterialType::Diffuse;
       else if (std::string("reflective") == material["type"].GetString()) type = MaterialType::Reflective;
-      scene_builder.get_geometry().add_material(Material(type, albedo, smooth_shading));
+      else if (std::string("refractive") == material["type"].GetString()) type = MaterialType::Refractive;
+      scene_builder.get_geometry().add_material(Material(type, mat_params));
     }
   }
 
