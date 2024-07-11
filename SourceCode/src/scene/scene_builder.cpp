@@ -6,7 +6,7 @@
 
 SceneBuilder::SceneBuilder()
 {
-  geometry_keyframes.push_back(std::make_shared<Geometry>());
+  geometry_keyframes.push_back(std::make_shared<GeometryBuilder>());
   light_keyframes.push_back(std::make_shared<InterpolatableData<Light>>());
   camera_keyframes.push_back(std::make_shared<CameraConfig>());
 }
@@ -26,17 +26,17 @@ void SceneBuilder::set_background(const Color& color)
   background_color = color;
 }
 
-const Geometry& SceneBuilder::get_geometry() const
+const GeometryBuilder& SceneBuilder::get_geometry() const
 {
   return *geometry_keyframes.back();
 }
 
-Geometry& SceneBuilder::get_geometry()
+GeometryBuilder& SceneBuilder::get_geometry()
 {
   if (geometry_keyframes.back().use_count() != 1)
   {
     // copy keyframe so it can be edited
-    geometry_keyframes.back() = std::make_shared<Geometry>(*(geometry_keyframes.back()));
+    geometry_keyframes.back() = std::make_shared<GeometryBuilder>(*(geometry_keyframes.back()));
   }
   return *geometry_keyframes.back();
 }
@@ -73,6 +73,8 @@ CameraConfig& SceneBuilder::get_camera()
 
 Scene SceneBuilder::build_scene()
 {
-  return Scene(geometry_keyframes, light_keyframes, camera_keyframes, frame_counts, background_color);
+  std::vector<std::shared_ptr<Geometry>> geometries;
+  for (const auto& geometry : geometry_keyframes) geometries.push_back(std::make_shared<Geometry>(geometry->build_geometry()));
+  return Scene(geometries, light_keyframes, camera_keyframes, frame_counts, background_color);
 }
 

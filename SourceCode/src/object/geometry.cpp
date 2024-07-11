@@ -5,27 +5,7 @@
 Geometry::Geometry(const InterpolatableData<Object>& objects, const std::vector<Material>& materials) : objects(objects), materials(materials)
 {}
 
-uint32_t Geometry::add_object(const Object& object)
-{
-  return objects.add_new_data(object);
-}
-
-void Geometry::add_material(const Material& material)
-{
-  materials.emplace_back(material);
-}
-
-const std::vector<Object>& Geometry::get_objects() const
-{
-  return objects.get_data();
-}
-
 const InterpolatableData<Object>& Geometry::get_interpolatable_objects() const
-{
-  return objects;
-}
-
-InterpolatableData<Object>& Geometry::get_interpolatable_objects()
 {
   return objects;
 }

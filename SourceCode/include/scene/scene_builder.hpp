@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "object/geometry.hpp"
+#include "object/geometry_builder.hpp"
 #include "object/light.hpp"
 #include "renderer/camera.hpp"
 #include "renderer/color.hpp"
@@ -15,8 +15,8 @@ public:
 
   void new_keyframe(uint32_t frame_count /* number of frames between previous and new keyframe */);
 
-  const Geometry& get_geometry() const;
-  Geometry& get_geometry();
+  const GeometryBuilder& get_geometry() const;
+  GeometryBuilder& get_geometry();
 
   const InterpolatableData<Light>& get_lights() const;
   InterpolatableData<Light>& get_lights();
@@ -28,7 +28,7 @@ public:
   Scene build_scene();
 
 private:
-  std::vector<std::shared_ptr<Geometry>> geometry_keyframes;
+  std::vector<std::shared_ptr<GeometryBuilder>> geometry_keyframes;
   std::vector<std::shared_ptr<InterpolatableData<Light>>> light_keyframes;
   std::vector<std::shared_ptr<CameraConfig>> camera_keyframes;
   std::vector<uint32_t> frame_counts;
