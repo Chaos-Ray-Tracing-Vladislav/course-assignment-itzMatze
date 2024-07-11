@@ -52,7 +52,7 @@ std::vector<BSDFSample> Material::get_bsdf_samples(const HitInfo& hit_info, cons
     BSDFSample reflection_sample(Ray(hit_info.pos + RAY_START_OFFSET * normal, cm::reflect(incident_dir, normal), RayConfig{.backface_culling = false}));
     reflection_sample.attenuation = cm::Vec3(fresnel);
     // refract returns a zero vector for total internal reflection
-    if (cm::dot(refraction_sample.ray.dir, refraction_sample.ray.dir) > 0.1) samples.push_back(refraction_sample);
+    if (cm::dot(refraction_sample.ray.get_dir(), refraction_sample.ray.get_dir()) > 0.1) samples.push_back(refraction_sample);
     else reflection_sample.attenuation = cm::Vec3(1.0);
     samples.push_back(reflection_sample);
   }

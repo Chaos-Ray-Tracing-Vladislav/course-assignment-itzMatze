@@ -108,6 +108,14 @@ Vec<T1, N> operator/(const Vec<T1, N>& a, const T2 b)
 }
 
 template<typename T1, typename T2, int N>
+Vec<T1, N> operator/(const T2 a, const Vec<T1, N>& b)
+{
+  T1 vals[N];
+  for (uint32_t i = 0; i < N; i++) vals[i] = T1(a) / b.values[i];
+  return Vec<T1, N>(vals);
+}
+
+template<typename T1, typename T2, int N>
 Vec<T1, N> operator*(const Vec<T1, N>& a, const T2 b)
 {
   T1 vals[N];

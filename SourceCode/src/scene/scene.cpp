@@ -63,7 +63,7 @@ bool Scene::step()
   return true;
 }
 
-bool Scene::is_animated()
+bool Scene::is_animated() const
 {
   return frame_counts.size() > 0;
 }

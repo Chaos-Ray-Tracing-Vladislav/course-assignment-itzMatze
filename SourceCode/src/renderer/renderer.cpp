@@ -126,11 +126,11 @@ void Renderer::render_buckets(std::vector<Color>* pixels, std::atomic<uint32_t>*
                 if (scene.get_geometry().intersect(shadow_ray, shadow_hit_info)) continue;
                 const float light_surface = 4.0 * M_PI * light_distance * light_distance;
                 cm::Vec3 contribution = cm::Vec3(light.get_intensity() / light_surface);
-                contribution *= path_vertex.attenuation * material.eval(hit_info, path_vertex.ray.dir, outgoing_dir);
+                contribution *= path_vertex.attenuation * material.eval(hit_info, path_vertex.ray.get_dir(), outgoing_dir);
                 color.value += contribution;
               }
             }
-            std::vector<BSDFSample> bsdf_samples = material.get_bsdf_samples(hit_info, path_vertex.ray.dir);
+            std::vector<BSDFSample> bsdf_samples = material.get_bsdf_samples(hit_info, path_vertex.ray.get_dir());
             for (const auto& bsdf_sample : bsdf_samples)
             {
               const uint32_t depth = path_vertex.depth + 1;

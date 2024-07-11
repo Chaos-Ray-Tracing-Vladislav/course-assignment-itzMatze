@@ -23,7 +23,7 @@ public:
   const std::vector<Light>& get_lights() const;
   const Camera& get_camera() const;
   bool step();
-  bool is_animated();
+  bool is_animated() const;
 
 private:
   std::vector<std::shared_ptr<Geometry>> geometry_keyframes;
