@@ -152,6 +152,8 @@ int load_scene_file(const std::string& file_path, SceneFile& scene_file)
 
   const auto& rj_image_settings = doc["settings"]["image_settings"];
   scene_file.settings.resolution = cm::Vec2u(rj_image_settings["width"].GetUint(), rj_image_settings["height"].GetUint());
+  // if no bucket size was set in scene file, use default value
+  scene_file.settings.bucket_size = rj_image_settings.HasMember("bucket_size") ? rj_image_settings["bucket_size"].GetUint() : 20;
   const auto& rj_background_color = doc["settings"]["background_color"].GetArray();
   scene_builder.set_background(Color(rj_background_color[0].GetFloat(), rj_background_color[1].GetFloat(), rj_background_color[2].GetFloat()));
 

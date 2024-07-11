@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "image/image_factory.hpp"
@@ -17,6 +18,8 @@ int main(int argc, char** argv)
   std::vector<Color> pixels;
   SceneFile scene_file;
   Renderer renderer;
+  const uint32_t thread_count = std::thread::hardware_concurrency();
+  std::cerr << "Using " << thread_count << " threads" << std::endl;
 #if 1
   // render all scenes
   for (uint32_t i = 0; i < 1; i++)
@@ -24,8 +27,8 @@ int main(int argc, char** argv)
     std::string file("13/scene" + std::to_string(i) + ".crtscene");
     Timer t;
     if (load_scene_file(file, scene_file) != 0) return 1;
-    renderer.init(scene_file.scene, scene_file.settings.resolution, file);
     std::cout << "Scene \"" << file << "\" loaded: " << t.restart<std::milli>() << "ms" << std::endl;
+    renderer.init(scene_file, file, thread_count);
     std::cout << "Renderer initialized: " << t.restart<std::milli>() << "ms" << std::endl;
     renderer.render();
     std::cout << "Rendering finished: " << t.restart<std::milli>() << "ms" << std::endl;

@@ -5,6 +5,7 @@
 struct Settings
 {
   cm::Vec2u resolution;
+  uint32_t bucket_size;
 };
 
 struct SceneFile
