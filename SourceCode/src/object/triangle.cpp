@@ -49,5 +49,6 @@ bool Triangle::intersect(const Ray& ray, HitInfo& hit_info, const std::vector<Ve
   hit_info.bary.v = cm::length(cm::cross(hit_info.pos - v0.pos, v1.pos - v0.pos)) / cm::length(cm::cross(v1.pos - v0.pos, v2.pos - v0.pos));
   hit_info.geometric_normal = geometric_normal;
   hit_info.normal = cm::normalize(hit_info.bary.u * v1.normal + hit_info.bary.v * v2.normal + (1.0 - hit_info.bary.u - hit_info.bary.v) * v0.normal);
+  hit_info.tex_coords = hit_info.bary.u * v1.tex_coords + hit_info.bary.v * v2.tex_coords + (1.0 - hit_info.bary.u - hit_info.bary.v) * v0.tex_coords;
   return true;
 }

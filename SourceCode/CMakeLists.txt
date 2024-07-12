@@ -9,6 +9,7 @@ set(SOURCE_FILES
   src/object/light.cpp
   src/object/material.cpp
   src/object/object.cpp
+  src/object/texture.cpp
   src/object/triangle.cpp
   src/renderer/camera.cpp
   src/renderer/color.cpp
@@ -20,6 +21,7 @@ set(SOURCE_FILES
   src/scene/scene_file_handler.cpp
   src/util/spatial_configuration.cpp
   src/util/random_generator.cpp
+  dependencies/stb/stb_image.cpp
   dependencies/stb/stb_image_write.cpp)
 
 add_executable(Chaos src/main.cpp ${SOURCE_FILES})

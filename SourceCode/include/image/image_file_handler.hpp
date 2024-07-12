@@ -13,6 +13,7 @@ enum class FileType
 };
 
 void save_single_image(const std::vector<Color>& pixels, const std::string& name, const cm::Vec2u resolution, FileType type = FileType::png);
+void load_image(const std::string& path, std::vector<uint32_t>& bitmap, cm::Vec2u& resolution);
 
 class ImageSeries
 {
