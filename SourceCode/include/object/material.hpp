@@ -1,6 +1,8 @@
 #pragma once
 
+#include <memory>
 #include <vector>
+#include "object/texture.hpp"
 #include "renderer/hit_info.hpp"
 #include "renderer/ray.hpp"
 #include "util/vec.hpp"
@@ -14,7 +16,7 @@ enum class MaterialType
 
 struct MaterialParameters
 {
-  cm::Vec3 albedo = cm::Vec3(0.99, 0.01, 0.55);
+  std::shared_ptr<Texture> albedo_texture = std::make_shared<Texture>(cm::Vec3(0.99, 0.01, 0.55));
   float ior = 1.5f;
   bool smooth_shading = true;
 };

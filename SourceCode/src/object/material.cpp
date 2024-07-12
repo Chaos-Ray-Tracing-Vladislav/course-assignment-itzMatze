@@ -13,7 +13,7 @@ cm::Vec3 Material::eval(const HitInfo& hit_info, const cm::Vec3& incident_dir, c
   // for dirac delta lobes every direction has a value of 0.0
   if (is_delta()) return cm::Vec3(0.0, 0.0, 0.0);
   const float cos_theta = cm::dot(outgoing_dir, params.smooth_shading ? hit_info.normal : hit_info.geometric_normal);
-  return params.albedo * std::max(0.0f, cos_theta);
+  return params.albedo_texture->get_value(hit_info.bary, hit_info.tex_coords) * std::max(0.0f, cos_theta);
 }
 
 float fresnel_schlick(float cos_theta, float n_1, float n_2)
@@ -30,7 +30,7 @@ std::vector<BSDFSample> Material::get_bsdf_samples(const HitInfo& hit_info, cons
   if (is_delta() && type == MaterialType::Reflective)
   {
     BSDFSample sample(Ray(hit_info.pos + RAY_START_OFFSET * normal, cm::reflect(incident_dir, normal)));
-    sample.attenuation = params.albedo;
+    sample.attenuation = params.albedo_texture->get_value(hit_info.bary, hit_info.tex_coords);
     samples.push_back(sample);
   }
   else if (is_delta() && type == MaterialType::Refractive)

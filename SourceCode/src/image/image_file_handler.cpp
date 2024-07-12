@@ -2,6 +2,7 @@
 #include <ctime>
 #include <fstream>
 #include <filesystem>
+#include "stb/stb_image.h"
 #include "stb/stb_image_write.h"
 
 void write_image(const std::vector<Color>& pixels, std::string image_path, const cm::Vec2u resolution, FileType type)
@@ -56,6 +57,27 @@ void save_single_image(const std::vector<Color>& pixels, const std::string& name
   std::string time_string(time_chars);
   image_path.append(time_string);
   write_image(pixels, image_path, resolution, type);
+}
+
+void load_image(const std::string& path, std::vector<uint32_t>& bitmap, cm::Vec2u& resolution)
+{
+  int width, height, channels;
+  unsigned char* pixels = stbi_load(path.c_str(), &width, &height, &channels, 0);
+  assert(channels == 3 || channels == 4);
+  resolution = cm::Vec2u(width, height);
+  for (uint32_t i = 0; i < width * height * channels; i += channels)
+  {
+    // if alpha channel is not there, set it to max value
+    uint32_t color = (channels == 4) ? pixels[i + 3] : 0xff;
+    color <<= 8;
+    color |= uint32_t(pixels[i + 2]);
+    color <<= 8;
+    color |= uint32_t(pixels[i + 1]);
+    color <<= 8;
+    color |= uint32_t(pixels[i]);
+    bitmap.emplace_back(color);
+  }
+  stbi_image_free(pixels);
 }
 
 ImageSeries::ImageSeries(const std::string& directory, const cm::Vec2u resolution, FileType type) : dir("../../Images/" + directory), resolution(resolution), type(type), image_idx(0)
