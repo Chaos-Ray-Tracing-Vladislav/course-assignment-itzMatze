@@ -20,7 +20,7 @@ int main(int argc, char** argv)
   Renderer renderer;
   const uint32_t thread_count = std::thread::hardware_concurrency();
   std::cerr << "Using " << thread_count << " threads" << std::endl;
-#if 1
+#if 0
   // render all scenes
   for (uint32_t i = 0; i < 1; i++)
   {
@@ -34,8 +34,11 @@ int main(int argc, char** argv)
     std::cout << "Rendering finished: " << t.restart<std::milli>() << "ms" << std::endl;
   }
 #endif
-#if 0
-  renderer.init(create_pyramid_star_scene(), {1920, 1080}, "pyramid_star");
+#if 1
+  scene_file.scene = create_pyramid_star_scene();
+  scene_file.settings.resolution = cm::Vec2u(1920, 1080);
+  scene_file.settings.bucket_size = 20;
+  renderer.init(scene_file, "pyramid_star", thread_count);
   renderer.render();
 #endif
   return 0;

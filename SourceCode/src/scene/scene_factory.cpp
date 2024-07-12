@@ -13,7 +13,7 @@ Scene create_single_triangle_scene()
     cm::Vec3(1.0, -1.0, -5.0),
     cm::Vec3(0.0, 1.0, -5.0)
   };
-  scene_builder.get_geometry().add_object(Object(vertices, {0, 1, 2}, SpatialConfiguration(), true));
+  scene_builder.get_geometry().add_object(Object(vertices, {0, 1, 2}, SpatialConfiguration(), -1, true));
   return scene_builder.build_scene();
 }
 
@@ -31,7 +31,7 @@ Scene create_triple_triangle_scene()
     cm::Vec3(2.0, -1.0, -4.0),
     cm::Vec3(1.0, 1.0, -4.0)
   };
-  scene_builder.get_geometry().add_object(Object(vertices, {0, 1, 2, 3, 4, 5, 6, 7, 8}, SpatialConfiguration(), true));
+  scene_builder.get_geometry().add_object(Object(vertices, {0, 1, 2, 3, 4, 5, 6, 7, 8}, SpatialConfiguration(), -1, true));
   return scene_builder.build_scene();
 }
 
@@ -59,7 +59,7 @@ Object add_star(const cm::Vec3& center, float inner_radius, float tip_length, ui
   }
   SpatialConfiguration spatial_conf;
   spatial_conf.set_position(center);
-  return Object(vertices, indices, spatial_conf, true);
+  return Object(vertices, indices, spatial_conf, -1, true);
 }
 
 Scene create_pyramid_star_scene()
@@ -87,10 +87,10 @@ Scene create_pyramid_star_scene()
     spatial_conf.rotate(45.0, 0.0, 0.0);
     // left pyramid
     spatial_conf.set_position(cm::Vec3(-2.0, 0.0, -6.0));
-    object_ids.emplace_back(scene_builder.get_geometry().add_object(Object(vertices, indices, spatial_conf, true)));
+    object_ids.emplace_back(scene_builder.get_geometry().add_object(Object(vertices, indices, spatial_conf, -1, true)));
     // right pyramid
     spatial_conf.set_position(cm::Vec3(2.0, 0.0, -6.0));
-    object_ids.emplace_back(scene_builder.get_geometry().add_object(Object(vertices, indices, spatial_conf, true)));
+    object_ids.emplace_back(scene_builder.get_geometry().add_object(Object(vertices, indices, spatial_conf, -1, true)));
   }
 
   // star
@@ -172,7 +172,7 @@ Scene hw06_task02()
     cm::Vec3(1.75, -1.75, -3.0),
     cm::Vec3(0.0, 1.75, -3.0)
   };
-  scene_builder.get_geometry().add_object(Object(vertices, {0, 1, 2}, SpatialConfiguration(), true));
+  scene_builder.get_geometry().add_object(Object(vertices, {0, 1, 2}, SpatialConfiguration(), -1, true));
   scene_builder.get_camera().get_spatial_conf().set_position(cm::Vec3(-4.0, 0.0, 1.0));
   const cm::Vec3 view_dir = cm::Vec3(0.0, 0.0, -3.0) - scene_builder.get_camera().get_spatial_conf().get_position();
   scene_builder.get_camera().get_spatial_conf().set_orientation(cm::quat_look_at(cm::normalize(view_dir)));
