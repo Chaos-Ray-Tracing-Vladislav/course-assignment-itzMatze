@@ -113,23 +113,6 @@ void Renderer::render_buckets(std::vector<Color>* pixels, std::atomic<uint32_t>*
             break;
 #else
             Material material = (hit_info.material_idx == -1) ? Material() : scene.get_geometry().get_materials()[hit_info.material_idx];
-            // if material is dirac delta reflective or there are no lights there is no need to evaluate lighting
-            if (!material.is_delta() && scene.get_lights().size() > 0)
-            {
-              for (const auto& light : scene.get_lights())
-              {
-                const cm::Vec3 outgoing_dir = cm::normalize(light.get_position() - hit_info.pos);
-                const float light_distance = cm::length(light.get_position() - hit_info.pos);
-                // trace shadow ray with small offset in the direction of the normal to avoid shadow acne
-                const Ray shadow_ray(hit_info.pos + RAY_START_OFFSET * hit_info.geometric_normal, outgoing_dir, RayConfig{.max_t = light_distance, .anyhit = true, .backface_culling = false});
-                HitInfo shadow_hit_info;
-                if (scene.get_geometry().intersect(shadow_ray, shadow_hit_info)) continue;
-                const float light_surface = 4.0 * M_PI * light_distance * light_distance;
-                cm::Vec3 contribution = cm::Vec3(light.get_intensity() / light_surface);
-                contribution *= path_vertex.attenuation * material.eval(hit_info, path_vertex.ray.get_dir(), outgoing_dir);
-                color.value += contribution;
-              }
-            }
             std::vector<BSDFSample> bsdf_samples = material.get_bsdf_samples(hit_info, path_vertex.ray.get_dir());
             for (const auto& bsdf_sample : bsdf_samples)
             {
@@ -138,6 +121,30 @@ void Renderer::render_buckets(std::vector<Color>* pixels, std::atomic<uint32_t>*
               {
                 const PathVertex next_path_vertex = PathVertex{bsdf_sample.ray, path_vertex.attenuation * bsdf_sample.attenuation, depth};
                 path_vertices.push_back(next_path_vertex);
+              }
+            }
+            // if material is dirac delta reflective or there are no lights there is no need to evaluate lighting
+            if (!material.is_delta())
+            {
+              if (scene.get_lights().size() > 0)
+              {
+                for (const auto& light : scene.get_lights())
+                {
+                  const cm::Vec3 outgoing_dir = cm::normalize(light.get_position() - hit_info.pos);
+                  const float light_distance = cm::length(light.get_position() - hit_info.pos);
+                  // trace shadow ray with small offset in the direction of the normal to avoid shadow acne
+                  const Ray shadow_ray(hit_info.pos + RAY_START_OFFSET * hit_info.geometric_normal, outgoing_dir, RayConfig{.max_t = light_distance, .anyhit = true, .backface_culling = false});
+                  HitInfo shadow_hit_info;
+                  if (scene.get_geometry().intersect(shadow_ray, shadow_hit_info)) continue;
+                  const float light_surface = 4.0 * M_PI * light_distance * light_distance;
+                  cm::Vec3 contribution = cm::Vec3(light.get_intensity() / light_surface);
+                  contribution *= path_vertex.attenuation * material.eval(hit_info, path_vertex.ray.get_dir(), outgoing_dir);
+                  color.value += contribution;
+                }
+              }
+              else
+              {
+                color.value += material.get_albedo(hit_info);
               }
             }
 #endif

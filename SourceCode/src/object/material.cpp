@@ -8,12 +8,17 @@ Material::Material() : type(MaterialType::Diffuse)
 Material::Material(MaterialType type, const MaterialParameters& params) : type(type), params(params)
 {}
 
+cm::Vec3 Material::get_albedo(const HitInfo& hit_info) const
+{
+  return params.albedo_texture->get_value(hit_info.bary, hit_info.tex_coords);
+}
+
 cm::Vec3 Material::eval(const HitInfo& hit_info, const cm::Vec3& incident_dir, const cm::Vec3& outgoing_dir) const
 {
   // for dirac delta lobes every direction has a value of 0.0
   if (is_delta()) return cm::Vec3(0.0, 0.0, 0.0);
   const float cos_theta = cm::dot(outgoing_dir, params.smooth_shading ? hit_info.normal : hit_info.geometric_normal);
-  return params.albedo_texture->get_value(hit_info.bary, hit_info.tex_coords) * std::max(0.0f, cos_theta);
+  return get_albedo(hit_info) * std::max(0.0f, cos_theta);
 }
 
 float fresnel_schlick(float cos_theta, float n_1, float n_2)
