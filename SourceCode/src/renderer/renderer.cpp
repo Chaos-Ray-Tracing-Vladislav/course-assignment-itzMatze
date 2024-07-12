@@ -30,18 +30,31 @@ void Renderer::render()
 
 std::vector<Color> Renderer::render_frame() const
 {
+  // store all rays that need to be traced, their accumulated attenuation, and their depth
+  struct PathVertex
+  {
+    Ray ray;
+    cm::Vec3 attenuation;
+    uint32_t depth;
+  };
+  std::vector<PathVertex> path_vertices;
+
   std::vector<Color> pixels(resolution.x * resolution.y);
   HitInfo hit_info;
   for (uint32_t y = 0; y < resolution.y; y++)
   {
     for (uint32_t x = 0; x < resolution.x; x++)
     {
-      Ray ray = scene.get_camera().get_ray(get_camera_coordinates({x, y}));
+      path_vertices.clear();
+      // add initial vertex of the camera
+      path_vertices.push_back(PathVertex{scene.get_camera().get_ray(get_camera_coordinates({x, y})), cm::Vec3(1.0, 1.0, 1.0), 0});
       Color color(0.0, 0.0, 0.0);
-      cm::Vec3 throughput(1.0, 1.0, 1.0);
-      for (uint32_t i = 0; i < 16; i++)
+      // trace rays as long as there are rays left to trace
+      while (!path_vertices.empty())
       {
-        if (scene.get_geometry().intersect(ray, hit_info))
+        PathVertex path_vertex = path_vertices.back();
+        path_vertices.pop_back();
+        if (scene.get_geometry().intersect(path_vertex.ray, hit_info))
         {
 #if 0
           // barycentric coordinates debug visualization
@@ -61,26 +74,31 @@ std::vector<Color> Renderer::render_frame() const
               const cm::Vec3 outgoing_dir = cm::normalize(light.get_position() - hit_info.pos);
               const float light_distance = cm::length(light.get_position() - hit_info.pos);
               // trace shadow ray with small offset in the direction of the normal to avoid shadow acne
-              const Ray shadow_ray(hit_info.pos + 0.0001 * hit_info.geometric_normal, outgoing_dir, RayConfig{.max_t = light_distance, .anyhit = true, .backface_culling = false});
+              const Ray shadow_ray(hit_info.pos + RAY_START_OFFSET * hit_info.geometric_normal, outgoing_dir, RayConfig{.max_t = light_distance, .anyhit = true, .backface_culling = false});
               HitInfo shadow_hit_info;
               if (scene.get_geometry().intersect(shadow_ray, shadow_hit_info)) continue;
               const float light_surface = 4.0 * M_PI * light_distance * light_distance;
               cm::Vec3 contribution = cm::Vec3(light.get_intensity() / light_surface);
-              contribution *= throughput * material.eval(hit_info, ray.dir, outgoing_dir);
+              contribution *= path_vertex.attenuation * material.eval(hit_info, path_vertex.ray.dir, outgoing_dir);
               color.value += contribution;
             }
           }
-          ray.origin = hit_info.pos;
-          cm::Vec3 attenuation;
-          if (!material.sample_dir(hit_info, ray.dir, ray.dir, attenuation)) break;
-          throughput *= attenuation;
+          std::vector<BSDFSample> bsdf_samples = material.get_bsdf_samples(hit_info, path_vertex.ray.dir);
+          for (const auto& bsdf_sample : bsdf_samples)
+          {
+            const uint32_t depth = path_vertex.depth + 1;
+            if (depth < 16)
+            {
+              const PathVertex next_path_vertex = PathVertex{bsdf_sample.ray, path_vertex.attenuation * bsdf_sample.attenuation, depth};
+              path_vertices.push_back(next_path_vertex);
+            }
+          }
 #endif
         }
         else
         {
           // background color
-          color.value += scene.get_background_color().value * throughput;
-          break;
+          color.value += scene.get_background_color().value * path_vertex.attenuation;
         }
       }
       pixels[y * resolution.x + x] = color;

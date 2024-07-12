@@ -2,6 +2,8 @@
 #include <limits>
 #include "util/vec.hpp"
 
+#define RAY_START_OFFSET 0.0001
+
 struct RayConfig
 {
   float max_t = std::numeric_limits<float>::max();
