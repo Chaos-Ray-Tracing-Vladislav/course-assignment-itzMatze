@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cassert>
 #include <cmath>
+#include <limits>
 #include <ostream>
 #include <iomanip>
 #include <type_traits>
@@ -145,6 +146,38 @@ bool operator==(const Vec<T, N>& a, const Vec<T, N>& b)
     if (a[i] != b[i]) return false;
   }
   return true;
+}
+
+template<typename T, int N>
+Vec<T, N> min(const Vec<T, N>& a, const Vec<T, N>& b)
+{
+  T vals[N];
+  for (uint32_t i = 0; i < N; i++) vals[i] = std::min(a[i], b[i]);
+  return Vec<T, N>(vals);
+}
+
+template<typename T, int N>
+Vec<T, N> max(const Vec<T, N>& a, const Vec<T, N>& b)
+{
+  T vals[N];
+  for (uint32_t i = 0; i < N; i++) vals[i] = std::max(a[i], b[i]);
+  return Vec<T, N>(vals);
+}
+
+template<typename T, int N>
+T min_component(const Vec<T, N>& a)
+{
+  T min = std::numeric_limits<T>::max();
+  for (uint32_t i = 0; i < N; i++) min = std::min(a[i], min);
+  return min;
+}
+
+template<typename T, int N>
+T max_component(const Vec<T, N>& a)
+{
+  T max = std::numeric_limits<T>::min();
+  for (uint32_t i = 0; i < N; i++) max = std::max(a[i], max);
+  return max;
 }
 
 template<typename T, int N>

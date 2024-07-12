@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(SOURCE_FILES
   src/image/image_factory.cpp
   src/image/image_file_handler.cpp
+  src/object/aabb.cpp
   src/object/geometry.cpp
   src/object/geometry_builder.cpp
   src/object/light.cpp

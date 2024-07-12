@@ -1,9 +1,23 @@
 #include "object/geometry.hpp"
+#include <limits>
 #include <vector>
 #include "util/interpolatable_data.hpp"
 
 Geometry::Geometry(const InterpolatableData<Object>& objects, const std::vector<Material>& materials) : objects(objects), materials(materials)
-{}
+{
+  cm::Vec3 min = cm::Vec3(std::numeric_limits<float>::max());
+  cm::Vec3 max = cm::Vec3(std::numeric_limits<float>::min());
+  for (const auto& object : objects.get_data())
+  {
+    const auto& vertices = object.get_vertices();
+    for (const auto& vertex : vertices)
+    {
+      min = cm::min(vertex.pos, min);
+      max = cm::max(vertex.pos, max);
+    }
+  }
+  bounding_box = AABB(min, max);
+}
 
 const InterpolatableData<Object>& Geometry::get_interpolatable_objects() const
 {
@@ -17,6 +31,7 @@ const std::vector<Material>& Geometry::get_materials() const
 
 bool Geometry::intersect(const Ray& ray, HitInfo& hit_info) const
 {
+  if (!bounding_box.intersect(ray)) return false;
   hit_info.t = ray.config.max_t;
   HitInfo cur_hit_info;
   for (const auto& object : objects.get_data())

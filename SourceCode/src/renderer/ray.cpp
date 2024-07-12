@@ -1,6 +1,6 @@
 #include "renderer/ray.hpp"
 
-Ray::Ray(const cm::Vec3& origin, const cm::Vec3& dir, const RayConfig config) : origin(origin), dir(cm::normalize(dir)), config(config)
+Ray::Ray(const cm::Vec3& origin, const cm::Vec3& dir, const RayConfig config) : origin(origin), dir(cm::normalize(dir)), inv_dir(1.0f / this->dir), config(config)
 {}
 
 cm::Vec3 Ray::at(float t) const
