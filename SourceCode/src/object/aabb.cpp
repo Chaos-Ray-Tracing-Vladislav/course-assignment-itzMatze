@@ -1,4 +1,8 @@
 #include "object/aabb.hpp"
+#include <limits>
+
+AABB::AABB() : min(std::numeric_limits<float>::max()), max(std::numeric_limits<float>::min())
+{}
 
 AABB::AABB(const cm::Vec3& min, const cm::Vec3& max) : min(min), max(max)
 {}

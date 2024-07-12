@@ -6,7 +6,7 @@
 class AABB
 {
 public:
-  AABB() = default;
+  AABB();
   AABB(const cm::Vec3& min, const cm::Vec3& max);
   bool intersect(const Ray& ray) const;
 

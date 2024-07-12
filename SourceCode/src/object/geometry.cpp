@@ -1,19 +1,17 @@
 #include "object/geometry.hpp"
-#include <limits>
 #include <vector>
 #include "util/interpolatable_data.hpp"
 
 Geometry::Geometry(const InterpolatableData<Object>& objects, const std::vector<Material>& materials) : objects(objects), materials(materials)
 {
-  cm::Vec3 min = cm::Vec3(std::numeric_limits<float>::max());
-  cm::Vec3 max = cm::Vec3(std::numeric_limits<float>::min());
+  AABB aabb;
   for (const auto& object : objects.get_data())
   {
     const AABB object_bounding_box = object.get_world_space_aabb();
-    min = cm::min(object_bounding_box.min, min);
-    max = cm::max(object_bounding_box.max, max);
+    aabb.min = cm::min(object_bounding_box.min, aabb.min);
+    aabb.max = cm::max(object_bounding_box.max, aabb.max);
   }
-  bounding_box = AABB(min, max);
+  bounding_box = aabb;
 }
 
 const InterpolatableData<Object>& Geometry::get_interpolatable_objects() const
