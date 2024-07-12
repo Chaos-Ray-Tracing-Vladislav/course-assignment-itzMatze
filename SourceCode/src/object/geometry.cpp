@@ -9,12 +9,9 @@ Geometry::Geometry(const InterpolatableData<Object>& objects, const std::vector<
   cm::Vec3 max = cm::Vec3(std::numeric_limits<float>::min());
   for (const auto& object : objects.get_data())
   {
-    const auto& vertices = object.get_vertices();
-    for (const auto& vertex : vertices)
-    {
-      min = cm::min(vertex.pos, min);
-      max = cm::max(vertex.pos, max);
-    }
+    const AABB object_bounding_box = object.get_world_space_aabb();
+    min = cm::min(object_bounding_box.min, min);
+    max = cm::max(object_bounding_box.max, max);
   }
   bounding_box = AABB(min, max);
 }

@@ -9,7 +9,7 @@ public:
   AABB() = default;
   AABB(const cm::Vec3& min, const cm::Vec3& max);
   bool intersect(const Ray& ray) const;
-private:
+
   cm::Vec3 min;
   cm::Vec3 max;
 };

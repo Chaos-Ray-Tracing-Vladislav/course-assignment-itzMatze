@@ -37,6 +37,18 @@ const std::vector<Vertex>& Object::get_vertices() const
   return vertices;
 }
 
+AABB Object::get_world_space_aabb() const
+{
+  cm::Vec3 min = cm::Vec3(std::numeric_limits<float>::max());
+  cm::Vec3 max = cm::Vec3(std::numeric_limits<float>::min());
+  for (const auto& vertex : vertices)
+  {
+    min = cm::min(vertex.pos, min);
+    max = cm::max(vertex.pos, max);
+  }
+  return AABB(spatial_conf.transform_pos(min), spatial_conf.transform_pos(max));
+}
+
 const SpatialConfiguration& Object::get_spatial_conf() const
 {
   return spatial_conf;
