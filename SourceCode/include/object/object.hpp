@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 #include "object/aabb.hpp"
 #include "object/triangle.hpp"
@@ -11,10 +12,10 @@ class Object
 {
 public:
   Object(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const SpatialConfiguration& spatial_conf, int32_t material_idx = -1, bool compute_normals = false);
-  Object(const std::vector<Vertex>& vertices, const std::vector<Triangle>& triangles, const SpatialConfiguration& spatial_conf, int32_t material_idx = -1);
+  Object(const std::shared_ptr<std::vector<Vertex>> vertices, const std::vector<Triangle>& triangles, const SpatialConfiguration& spatial_conf, int32_t material_idx = -1);
   const std::vector<Triangle>& get_triangles() const;
-  const std::vector<Vertex>& get_vertices() const;
-  AABB get_world_space_aabb() const;
+  const std::shared_ptr<std::vector<Vertex>> get_vertices() const;
+  AABB get_world_space_bounding_box() const;
   const SpatialConfiguration& get_spatial_conf() const;
   SpatialConfiguration& get_spatial_conf();
   void set_spatial_conf(const SpatialConfiguration& spatial_configuration);
@@ -22,7 +23,7 @@ public:
 
 private:
   SpatialConfiguration spatial_conf;
-  std::vector<Vertex> vertices;
+  std::shared_ptr<std::vector<Vertex>> vertices;
   std::vector<Triangle> triangles;
   int32_t material_idx;
 };

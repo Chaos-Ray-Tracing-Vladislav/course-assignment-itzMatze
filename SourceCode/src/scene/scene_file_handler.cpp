@@ -184,7 +184,7 @@ int load_scene_file(const std::string& file_path, SceneFile& scene_file)
   load_objects(doc["objects"].GetArray(), scene_builder);
 
   scene_builder.get_camera().set_focal_length(0.012);
-  scene_file.scene = scene_builder.build_scene();
+  scene_file.scene = std::make_shared<Scene>(scene_builder.build_scene());
   return 0;
 }
 

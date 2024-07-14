@@ -10,7 +10,7 @@ struct Settings
 
 struct SceneFile
 {
-  Scene scene;
+  std::shared_ptr<Scene> scene;
   Settings settings;
 };
 

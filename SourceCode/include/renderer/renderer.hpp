@@ -19,7 +19,7 @@ private:
     cm::Vec2u max;
   };
 
-  Scene scene;
+  std::shared_ptr<Scene> scene;
   cm::Vec2u resolution;
   std::string output_name;
   bool use_jittering = false;

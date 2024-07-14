@@ -7,7 +7,7 @@ Geometry::Geometry(const InterpolatableData<Object>& objects, const std::vector<
   AABB aabb;
   for (const auto& object : objects.get_data())
   {
-    const AABB object_bounding_box = object.get_world_space_aabb();
+    const AABB object_bounding_box = object.get_world_space_bounding_box();
     aabb.min = cm::min(object_bounding_box.min, aabb.min);
     aabb.max = cm::max(object_bounding_box.max, aabb.max);
   }
