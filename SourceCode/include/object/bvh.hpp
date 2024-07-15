@@ -63,21 +63,41 @@ public:
     p1[axis] -= mid;
     AABB box_0(node.bounding_box.min, p1);
     AABB box_1(p0, node.bounding_box.max);
-    // assign objects to their corresponding bounding box child
+    // store which objects are contained in which child and which objects are contained in both
     std::vector<uint32_t> indices_0;
     std::vector<uint32_t> indices_1;
+    std::vector<uint32_t> common_indices;
     for (uint32_t i : node.indices)
     {
       bool intersect_0 = objects[i].intersect(box_0);
       bool intersect_1 = objects[i].intersect(box_1);
-      if (intersect_0 && intersect_1)
-      {
-        // if both boxes contain the object distribute evenly to the children
-        if (indices_0.size() < indices_1.size()) indices_0.push_back(i);
-        else indices_1.push_back(i);
-      }
+      if (intersect_0 && intersect_1) common_indices.push_back(i);
       else if (intersect_0) indices_0.push_back(i);
       else if (intersect_1) indices_1.push_back(i);
+    }
+    // distribute the objects as evenly as possible to the children
+    int32_t diff = indices_0.size() - indices_1.size();
+    uint32_t common_idx = 0;
+    // fill up child with fewer elements
+    while (diff > 0 && common_idx < common_indices.size())
+    {
+      indices_1.push_back(common_indices[common_idx]);
+      diff--;
+      common_idx++;
+    }
+    while (diff < 0 && common_idx < common_indices.size())
+    {
+      indices_0.push_back(common_indices[common_idx]);
+      diff++;
+      common_idx++;
+    }
+    // distribute the remaining objects alternatingly
+    while (common_idx < common_indices.size())
+    {
+      if (diff & 1u) indices_0.push_back(common_indices[common_idx]);
+      else indices_1.push_back(common_indices[common_idx]);
+      diff++;
+      common_idx++;
     }
     // create child nodes, their aabb is computed in the constructor
     node.is_leaf = false;
