@@ -57,3 +57,21 @@ bool Triangle::intersect(const Ray& ray, HitInfo& hit_info) const
   hit_info.tex_coords = hit_info.bary.u * v1.tex_coords + hit_info.bary.v * v2.tex_coords + (1.0 - hit_info.bary.u - hit_info.bary.v) * v0.tex_coords;
   return true;
 }
+
+AABB Triangle::get_bounding_box() const
+{
+  AABB bounding_box;
+  bounding_box.min = cm::min(bounding_box.min, (*vertices)[vertex_indices[0]].pos);
+  bounding_box.min = cm::min(bounding_box.min, (*vertices)[vertex_indices[1]].pos);
+  bounding_box.min = cm::min(bounding_box.min, (*vertices)[vertex_indices[2]].pos);
+  bounding_box.max = cm::max(bounding_box.max, (*vertices)[vertex_indices[0]].pos);
+  bounding_box.max = cm::max(bounding_box.max, (*vertices)[vertex_indices[1]].pos);
+  bounding_box.max = cm::max(bounding_box.max, (*vertices)[vertex_indices[2]].pos);
+  return bounding_box;
+}
+
+bool Triangle::intersect(const AABB& aabb) const
+{
+  const AABB bounding_box = get_bounding_box();
+  return bounding_box.intersect(aabb);
+}

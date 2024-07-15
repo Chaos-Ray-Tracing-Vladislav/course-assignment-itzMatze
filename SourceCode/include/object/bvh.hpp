@@ -110,6 +110,7 @@ public:
 
   bool intersect(const Ray& ray, HitInfo& hit_info, const std::vector<T>& objects) const
   {
+    const float previous_closest = hit_info.t;
     std::stack<int32_t> nodes_to_test;
     // add root node as initial node
     nodes_to_test.push(0);
@@ -136,7 +137,7 @@ public:
         }
       }
     }
-    return hit_info.t < ray.config.max_t;
+    return hit_info.t < previous_closest;
   }
 
   std::vector<Node> nodes;

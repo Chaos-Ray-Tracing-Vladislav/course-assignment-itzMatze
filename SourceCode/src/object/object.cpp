@@ -22,10 +22,11 @@ Object::Object(const std::vector<Vertex>& vertices, const std::vector<uint32_t>&
       if (cm::length(vertex.normal) > 0.0001) vertex.normal = cm::normalize(vertex.normal);
     }
   }
+  bvh = BVH<Triangle>(triangles, 1);
 }
 
 Object::Object(const std::shared_ptr<std::vector<Vertex>> vertices, const std::vector<Triangle>& triangles, const SpatialConfiguration& spatial_conf, int32_t material_idx) :
-  spatial_conf(spatial_conf), vertices(vertices), triangles(triangles), material_idx(material_idx)
+  spatial_conf(spatial_conf), vertices(vertices), triangles(triangles), bvh(this->triangles, 1), material_idx(material_idx)
 {}
 
 const std::vector<Triangle>& Object::get_triangles() const
@@ -64,18 +65,12 @@ bool Object::intersect(const Ray& ray, HitInfo& hit_info) const
   HitInfo cur_hit_info;
   // transform ray into local coordinate system of object
   const Ray transformed_ray(spatial_conf.inverse_transform_pos(ray.origin), spatial_conf.inverse_transform_dir(ray.get_dir()), ray.config);
-  for (const auto& triangle : triangles)
+  // if no intersection was found return false
+  if (!bvh.intersect(transformed_ray, cur_hit_info, triangles)) return false;
+  // if looking for closest hit check if new intersection is closer than old one
+  if (cur_hit_info.t < hit_info.t)
   {
-    // test if object is intersected and if yes whether the intersection is closer than the previous ones
-    if (triangle.intersect(transformed_ray, cur_hit_info) && (cur_hit_info.t < hit_info.t))
-    {
-      hit_info = cur_hit_info;
-      if (ray.config.anyhit) return true;
-    }
-  }
-  // if an intersection was found, t is the distance to this intersection instead of maximum float value
-  if (hit_info.t < ray.config.max_t)
-  {
+    hit_info = cur_hit_info;
     // transform normals
     hit_info.geometric_normal = spatial_conf.transform_dir(hit_info.geometric_normal);
     hit_info.normal = spatial_conf.transform_dir(hit_info.normal);

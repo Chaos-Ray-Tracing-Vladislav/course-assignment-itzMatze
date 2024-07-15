@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include "object/aabb.hpp"
+#include "object/bvh.hpp"
 #include "object/triangle.hpp"
 #include "object/vertex.hpp"
 #include "renderer/hit_info.hpp"
@@ -26,6 +27,7 @@ private:
   SpatialConfiguration spatial_conf;
   std::shared_ptr<std::vector<Vertex>> vertices;
   std::vector<Triangle> triangles;
+  BVH<Triangle> bvh;
   int32_t material_idx;
 };
 
