@@ -2,17 +2,8 @@
 #include <vector>
 #include "util/interpolatable_data.hpp"
 
-Geometry::Geometry(const InterpolatableData<Object>& objects, const std::vector<Material>& materials) : objects(objects), materials(materials)
-{
-  AABB aabb;
-  for (const auto& object : objects.get_data())
-  {
-    const AABB object_bounding_box = object.get_world_space_bounding_box();
-    aabb.min = cm::min(object_bounding_box.min, aabb.min);
-    aabb.max = cm::max(object_bounding_box.max, aabb.max);
-  }
-  bounding_box = aabb;
-}
+Geometry::Geometry(const InterpolatableData<Object>& objects, const std::vector<Material>& materials) : objects(objects), materials(materials), bvh(objects.get_data(), 1)
+{}
 
 const InterpolatableData<Object>& Geometry::get_interpolatable_objects() const
 {
@@ -26,20 +17,8 @@ const std::vector<Material>& Geometry::get_materials() const
 
 bool Geometry::intersect(const Ray& ray, HitInfo& hit_info) const
 {
-  if (!bounding_box.intersect(ray)) return false;
   hit_info.t = ray.config.max_t;
-  HitInfo cur_hit_info;
-  for (const auto& object : objects.get_data())
-  {
-    // test if object is intersected and if yes whether the intersection is closer than the previous ones
-    if (object.intersect(ray, cur_hit_info) && (cur_hit_info.t < hit_info.t))
-    {
-      hit_info = cur_hit_info;
-      if (ray.config.anyhit) return true;
-    }
-  }
-  // if an intersection was found, t is the distance to this intersection instead of maximum float value
-  return (hit_info.t < ray.config.max_t);
+  return (bvh.intersect(ray, hit_info, objects.get_data()));
 }
 
 Geometry interpolate(const Geometry& a, const Geometry& b, float weight)

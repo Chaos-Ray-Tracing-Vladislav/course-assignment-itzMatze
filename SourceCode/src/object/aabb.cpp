@@ -19,3 +19,14 @@ bool AABB::intersect(const Ray& ray) const
   const float t_box_max = std::min(cm::min_component(t_maxes), ray.config.max_t);
   return t_box_min <= t_box_max;
 }
+
+bool AABB::intersect(const AABB& other) const
+{
+  if (min.x > other.max.x) return false;
+  if (min.y > other.max.y) return false;
+  if (min.z > other.max.z) return false;
+  if (max.x < other.min.x) return false;
+  if (max.y < other.min.y) return false;
+  if (max.z < other.min.z) return false;
+  return true;
+}

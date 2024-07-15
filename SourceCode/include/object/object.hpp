@@ -20,6 +20,7 @@ public:
   SpatialConfiguration& get_spatial_conf();
   void set_spatial_conf(const SpatialConfiguration& spatial_configuration);
   bool intersect(const Ray& ray, HitInfo& hit_info) const;
+  bool intersect(const AABB& aabb) const;
 
 private:
   SpatialConfiguration spatial_conf;

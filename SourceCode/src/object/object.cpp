@@ -85,6 +85,12 @@ bool Object::intersect(const Ray& ray, HitInfo& hit_info) const
   return false;
 }
 
+bool Object::intersect(const AABB& aabb) const
+{
+  const AABB bounding_box = get_world_space_bounding_box();
+  return bounding_box.intersect(aabb);
+}
+
 Object interpolate(const Object& a, const Object& b, float weight)
 {
   SpatialConfiguration spatial_conf = interpolate(a.get_spatial_conf(), b.get_spatial_conf(), weight);
