@@ -1,3 +1,4 @@
+Test Processor: AMD Ryzen 3700x
 # single threaded
 - Scene "13/scene0.crtscene" loaded: 1.25039ms
 - Renderer initialized: 0.0417ms
