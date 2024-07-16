@@ -12,6 +12,7 @@ void Renderer::init(const SceneFile& scene_file, const std::string& name, uint32
   scene = scene_file.scene;
   resolution = scene_file.settings.resolution;
   output_name = name;
+  buckets.clear();
 
   // divide image into buckets that can be rendered concurrently
   const cm::Vec2u bucket_count = (resolution / scene_file.settings.bucket_size);
