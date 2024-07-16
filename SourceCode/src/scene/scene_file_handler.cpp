@@ -113,33 +113,38 @@ void load_materials(const auto& rj_materials, SceneBuilder& scene_builder, std::
   }
 }
 
+Object load_object(const auto& rj_object)
+{
+  const auto& rj_vertices = rj_object["vertices"].GetArray();
+  std::vector<Vertex> vertices;
+  for (size_t i = 0; i < rj_vertices.Size(); i += 3)
+  {
+    Vertex vertex;
+    vertex.pos = get_vec3(rj_vertices, i);
+    if (rj_object.HasMember("uvs"))
+    {
+      cm::Vec3 uvs = get_vec3(rj_object["uvs"].GetArray(), i);
+      vertex.tex_coords = cm::Vec2(uvs.x, uvs.y);
+    }
+    vertices.emplace_back(vertex);
+  }
+
+  const auto& rj_indices = rj_object["triangles"].GetArray();
+  std::vector<uint32_t> indices;
+  for (size_t i = 0; i < rj_indices.Size(); i++)
+  {
+    indices.emplace_back(rj_indices[i].GetInt());
+  }
+  int32_t material_idx = -1;
+  if (rj_object.HasMember("material_index")) material_idx = rj_object["material_index"].GetInt();
+  return Object(vertices, indices, SpatialConfiguration(), material_idx, true);
+}
+
 void load_objects(const auto& rj_objects, SceneBuilder& scene_builder)
 {
   for (const auto& object : rj_objects)
   {
-    const auto& rj_vertices = object["vertices"].GetArray();
-    std::vector<Vertex> vertices;
-    for (size_t i = 0; i < rj_vertices.Size(); i += 3)
-    {
-      Vertex vertex;
-      vertex.pos = get_vec3(rj_vertices, i);
-      if (object.HasMember("uvs"))
-      {
-        cm::Vec3 uvs = get_vec3(object["uvs"].GetArray(), i);
-        vertex.tex_coords = cm::Vec2(uvs.x, uvs.y);
-      }
-      vertices.emplace_back(vertex);
-    }
-
-    const auto& rj_indices = object["triangles"].GetArray();
-    std::vector<uint32_t> indices;
-    for (size_t i = 0; i < rj_indices.Size(); i++)
-    {
-      indices.emplace_back(rj_indices[i].GetInt());
-    }
-    int32_t material_idx = -1;
-    if (object.HasMember("material_index")) material_idx = object["material_index"].GetInt();
-    scene_builder.get_geometry().add_object(Object(vertices, indices, SpatialConfiguration(), material_idx, true));
+    scene_builder.get_geometry().add_object(load_object(object));
   }
 }
 
@@ -185,6 +190,15 @@ int load_scene_file(const std::string& file_path, SceneFile& scene_file)
 
   scene_builder.get_camera().set_focal_length(0.012);
   scene_file.scene = std::make_shared<Scene>(scene_builder.build_scene());
+  return 0;
+}
+
+int load_object_file(const std::string& file_path, Object& object)
+{
+  const std::string path(std::string("../../Scenes/") + file_path);
+  rapidjson::Document doc;
+  if (load_file(path, doc) != 0) return 1;
+  object = load_object(doc);
   return 0;
 }
 

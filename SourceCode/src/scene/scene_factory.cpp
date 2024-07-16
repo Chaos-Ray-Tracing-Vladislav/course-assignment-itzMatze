@@ -2,6 +2,7 @@
 #include "object/object.hpp"
 #include "scene/scene.hpp"
 #include "scene/scene_builder.hpp"
+#include "scene/scene_file_handler.hpp"
 #include "util/quat.hpp"
 #include "util/vec.hpp"
 
@@ -91,6 +92,11 @@ Scene create_pyramid_star_scene()
     // right pyramid
     spatial_conf.set_position(cm::Vec3(2.0, 0.0, -6.0));
     object_ids.emplace_back(scene_builder.get_geometry().add_object(Object(vertices, indices, spatial_conf, -1, true)));
+    Object object;
+    if (load_object_file("dragon.crtobject", object) != 0) return Scene();
+    object.get_spatial_conf().rotate(-90.0, 0.0, 0.0);
+    object.get_spatial_conf().set_position(cm::Vec3(0.0, 0.0, -20.0));
+    object_ids.emplace_back(scene_builder.get_geometry().add_object(object));
   }
 
   // star

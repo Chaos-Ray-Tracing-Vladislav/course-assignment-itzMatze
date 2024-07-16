@@ -152,7 +152,7 @@ void Renderer::render_buckets(std::vector<Color>* pixels, std::atomic<uint32_t>*
 #endif
           }
           else
-        {
+          {
             // background color
             color.value += scene->get_background_color().value * path_vertex.attenuation;
           }
