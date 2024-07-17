@@ -39,19 +39,19 @@ public:
 
   T& get_element(uint32_t id)
   {
-    uint32_t idx = id;
+    uint32_t idx = std::min(id, uint32_t(ids.size() - 1));
     while (id < ids[idx]) idx--;
     while (id > ids[idx]) idx++;
-    assert(id == ids[idx]);
+    assert(idx < ids.size() && id == ids[idx]);
     return data[idx];
   }
 
   void remove_element(uint32_t id)
   {
-    uint32_t idx = id;
+    uint32_t idx = std::min(id, uint32_t(ids.size() - 1));
     while (id < ids[idx]) idx--;
     while (id > ids[idx]) idx++;
-    assert(id == ids[idx]);
+    assert(idx < ids.size() && id == ids[idx]);
     data.erase(data.begin() + idx);
     ids.erase(ids.begin() + idx);
   }
@@ -82,11 +82,12 @@ InterpolatableData<T> interpolate(const InterpolatableData<T>& a, const Interpol
   const std::vector<uint32_t>& ids_b = b.get_ids();
 
   assert(data_a.size() == ids_a.size() && data_b.size() == ids_b.size());
-  for (uint32_t i = 0, j = 0; i < data_a.size() && j < data_b.size();)
+  uint32_t i = 0, j = 0;
+  while (i < data_a.size() && j < data_b.size())
   {
     if (ids_a[i] == ids_b[j])
     {
-      result_data.emplace_back(interpolate(data_a[i], data_b[i], weight));
+      result_data.emplace_back(interpolate(data_a[i], data_b[j], weight));
       result_ids.emplace_back(ids_a[i]);
       i++;
       j++;
@@ -100,6 +101,13 @@ InterpolatableData<T> interpolate(const InterpolatableData<T>& a, const Interpol
     }
     // additional data in the next keyframe will be added when that keyframe is reached
     else if (ids_a[i] > ids_b[j]) j++;
+  }
+  // add remaining objects
+  while (i < data_a.size())
+  {
+    result_data.emplace_back(data_a[i]);
+    result_ids.emplace_back(ids_a[i]);
+    i++;
   }
   return InterpolatableData(result_data, result_ids);
 }
