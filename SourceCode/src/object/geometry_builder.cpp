@@ -18,6 +18,16 @@ InterpolatableData<Object>& GeometryBuilder::get_interpolatable_objects()
   return objects;
 }
 
+Object& GeometryBuilder::get_object(uint32_t id)
+{
+  return objects.get_element(id);
+}
+
+void GeometryBuilder::remove_object(uint32_t id)
+{
+  objects.remove_element(id);
+}
+
 Geometry GeometryBuilder::build_geometry()
 {
   return Geometry(objects, materials);

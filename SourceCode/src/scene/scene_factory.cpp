@@ -106,7 +106,7 @@ Scene create_pyramid_star_scene()
     scene_builder.new_keyframe(30);
     for (uint32_t id : object_ids)
     {
-      scene_builder.get_geometry().get_interpolatable_objects().get_element(id).get_spatial_conf().rotate(90.0, 0.0, 0.0);
+      scene_builder.get_geometry().get_object(id).get_spatial_conf().rotate(90.0, 0.0, 0.0);
     }
     scene_builder.get_camera().get_spatial_conf().set_position(cm::Vec3(-4.0, 0.0, 1.0));
     const cm::Vec3 view_dir = cm::Vec3(0.0, 0.0, -6.0) - scene_builder.get_camera().get_spatial_conf().get_position();
@@ -117,7 +117,7 @@ Scene create_pyramid_star_scene()
     scene_builder.new_keyframe(30);
     for (uint32_t id : object_ids)
     {
-      scene_builder.get_geometry().get_interpolatable_objects().get_element(id).get_spatial_conf().rotate(90.0, 0.0, 0.0);
+      scene_builder.get_geometry().get_object(id).get_spatial_conf().rotate(90.0, 0.0, 0.0);
     }
     scene_builder.get_camera().get_spatial_conf().set_position(cm::Vec3(-4.0, 4.0, 1.0));
   }
@@ -126,7 +126,7 @@ Scene create_pyramid_star_scene()
     scene_builder.new_keyframe(30);
     for (uint32_t id : object_ids)
     {
-      scene_builder.get_geometry().get_interpolatable_objects().get_element(id).get_spatial_conf().rotate(90.0, 0.0, 0.0);
+      scene_builder.get_geometry().get_object(id).get_spatial_conf().rotate(90.0, 0.0, 0.0);
     }
     const cm::Vec3 view_dir = cm::Vec3(0.0, 0.0, -6.0) - scene_builder.get_camera().get_spatial_conf().get_position();
     scene_builder.get_camera().get_spatial_conf().set_orientation(cm::quat_look_at(cm::normalize(view_dir)));
@@ -136,7 +136,7 @@ Scene create_pyramid_star_scene()
     scene_builder.new_keyframe(30);
     for (uint32_t id : object_ids)
     {
-      scene_builder.get_geometry().get_interpolatable_objects().get_element(id).get_spatial_conf().rotate(90.0, 0.0, 0.0);
+      scene_builder.get_geometry().get_object(id).get_spatial_conf().rotate(90.0, 0.0, 0.0);
     }
     scene_builder.get_camera().get_spatial_conf().set_position(cm::Vec3(0.0, 0.0, 0.0));
     scene_builder.get_camera().get_spatial_conf().set_orientation(cm::quat_look_at(cm::Vec3(0.0, 0.0, -1.0)));
@@ -146,7 +146,7 @@ Scene create_pyramid_star_scene()
     scene_builder.new_keyframe(15);
     for (uint32_t id : object_ids)
     {
-      scene_builder.get_geometry().get_interpolatable_objects().get_element(id).get_spatial_conf().rotate(45.0, 0.0, 0.0);
+      scene_builder.get_geometry().get_object(id).get_spatial_conf().rotate(45.0, 0.0, 0.0);
     }
     scene_builder.get_camera().get_spatial_conf().rotate(30.0, 0.0, 0.0);
   }
@@ -154,7 +154,7 @@ Scene create_pyramid_star_scene()
     scene_builder.new_keyframe(30);
     for (uint32_t id : object_ids)
     {
-      scene_builder.get_geometry().get_interpolatable_objects().get_element(id).get_spatial_conf().rotate(90.0, 0.0, 0.0);
+      scene_builder.get_geometry().get_object(id).get_spatial_conf().rotate(90.0, 0.0, 0.0);
     }
     scene_builder.get_camera().get_spatial_conf().rotate(-60.0, 0.0, 0.0);
   }
@@ -162,7 +162,7 @@ Scene create_pyramid_star_scene()
     scene_builder.new_keyframe(15);
     for (uint32_t id : object_ids)
     {
-      scene_builder.get_geometry().get_interpolatable_objects().get_element(id).get_spatial_conf().rotate(45.0, 0.0, 0.0);
+      scene_builder.get_geometry().get_object(id).get_spatial_conf().rotate(45.0, 0.0, 0.0);
     }
     scene_builder.get_camera().get_spatial_conf().rotate(30.0, 0.0, 0.0);
   }

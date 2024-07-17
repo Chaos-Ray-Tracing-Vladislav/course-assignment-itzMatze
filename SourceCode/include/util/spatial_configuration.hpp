@@ -12,8 +12,9 @@ class SpatialConfiguration
 {
 public:
   SpatialConfiguration();
-  SpatialConfiguration(const cm::Mat3& orientation, const cm::Vec3& position);
-  SpatialConfiguration(const cm::Quatf& orientation, const cm::Vec3& position);
+  SpatialConfiguration(const cm::Mat3& orientation, const cm::Vec3& position = cm::Vec3(0.0, 0.0, 0.0));
+  SpatialConfiguration(const cm::Quatf& orientation, const cm::Vec3& position = cm::Vec3(0.0, 0.0, 0.0));
+  SpatialConfiguration(const cm::Vec3& position);
   void translate(const cm::Vec3& translation);
   void set_position(const cm::Vec3& position);
   void rotate(cm::Vec3 angles, bool use_radian = false);

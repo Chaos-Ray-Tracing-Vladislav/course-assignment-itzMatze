@@ -16,6 +16,11 @@ SpatialConfiguration::SpatialConfiguration(const cm::Quatf& orientation, const c
   update_coordinate_system();
 }
 
+SpatialConfiguration::SpatialConfiguration(const cm::Vec3& position) : orientation(cm::Quatf(1.0, 0.0, 0.0, 0.0)), position(position)
+{
+  update_coordinate_system();
+}
+
 void SpatialConfiguration::translate(const cm::Vec3& translation)
 {
   position += translation;
