@@ -21,6 +21,11 @@ cm::Vec3 Light::get_position() const
   return position;
 }
 
+float Light::set_intensity(float new_intensity)
+{
+  return intensity = new_intensity;
+}
+
 Light interpolate(const Light& a, const Light& b, float weight)
 {
   cm::Vec3 pos = (1 - weight) * a.get_position() + weight * b.get_position();
