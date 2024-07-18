@@ -101,19 +101,6 @@ void Renderer::render_buckets(std::vector<Color>* pixels, std::atomic<uint32_t>*
           path_vertices.pop_back();
           if (scene->get_geometry().intersect(path_vertex.ray, hit_info))
           {
-#if 0
-            // barycentric coordinates debug visualization
-            color = Color(hit_info.bary.u, hit_info.bary.v, 1.0);
-            break;
-#elif 0
-            // normal debug visualization
-            color = Color((hit_info.normal + 1.0) / 2.0);
-            break;
-#elif 0
-            // texture coordinates debug visualization
-            color = Color(hit_info.tex_coords.u, hit_info.tex_coords.v, 1.0);
-            break;
-#else
             Material material = (hit_info.material_idx == -1) ? Material() : scene->get_geometry().get_materials()[hit_info.material_idx];
             std::vector<BSDFSample> bsdf_samples = material.get_bsdf_samples(hit_info, path_vertex.ray.get_dir());
             for (const auto& bsdf_sample : bsdf_samples)
@@ -128,7 +115,12 @@ void Renderer::render_buckets(std::vector<Color>* pixels, std::atomic<uint32_t>*
             // if material is dirac delta reflective or there are no lights there is no need to evaluate lighting
             if (!material.is_delta())
             {
-              if (scene->get_lights().size() > 0)
+              // if material does not depend on light (usually debug vis) just fetch albedo
+              if (!material.is_light_dependent())
+              {
+                color.value += material.get_albedo(hit_info);
+              }
+              else
               {
                 for (const auto& light : scene->get_lights())
                 {
@@ -144,12 +136,7 @@ void Renderer::render_buckets(std::vector<Color>* pixels, std::atomic<uint32_t>*
                   color.value += contribution;
                 }
               }
-              else
-              {
-                color.value += material.get_albedo(hit_info);
-              }
             }
-#endif
           }
           else
           {

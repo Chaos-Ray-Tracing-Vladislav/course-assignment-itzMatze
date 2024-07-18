@@ -10,7 +10,11 @@ Material::Material(MaterialType type, const MaterialParameters& params) : type(t
 
 cm::Vec3 Material::get_albedo(const HitInfo& hit_info) const
 {
-  return params.albedo_texture->get_value(hit_info.bary, hit_info.tex_coords);
+  if (params.show_bary) return cm::Vec3(hit_info.bary.u, hit_info.bary.v, 1.0);
+  else if (params.show_normal && !params.smooth_shading) return cm::Vec3((hit_info.geometric_normal + 1.0) / 2.0);
+  else if (params.show_normal) return cm::Vec3((hit_info.normal + 1.0) / 2.0);
+  else if (params.show_tex_coords) return cm::Vec3(hit_info.tex_coords.u, hit_info.tex_coords.v, 1.0);
+  else return params.albedo_texture->get_value(hit_info.bary, hit_info.tex_coords);
 }
 
 cm::Vec3 Material::eval(const HitInfo& hit_info, const cm::Vec3& incident_dir, const cm::Vec3& outgoing_dir) const
@@ -67,4 +71,9 @@ std::vector<BSDFSample> Material::get_bsdf_samples(const HitInfo& hit_info, cons
 bool Material::is_delta() const
 {
   return (type == MaterialType::Reflective || type == MaterialType::Refractive);
+}
+
+bool Material::is_light_dependent() const
+{
+  return (!params.show_albedo && !params.show_bary && !params.show_normal && !params.show_tex_coords);
 }

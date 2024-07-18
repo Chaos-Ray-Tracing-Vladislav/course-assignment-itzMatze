@@ -89,5 +89,5 @@ bool Object::intersect(const AABB& aabb) const
 Object interpolate(const Object& a, const Object& b, float weight)
 {
   SpatialConfiguration spatial_conf = interpolate(a.get_spatial_conf(), b.get_spatial_conf(), weight);
-  return Object(a.get_vertices(), a.get_triangles(), spatial_conf);
+  return Object(a.get_vertices(), a.get_triangles(), spatial_conf, a.material_idx);
 }
