@@ -71,7 +71,8 @@ bool Object::intersect(const Ray& ray, HitInfo& hit_info) const
   if (cur_hit_info.t < hit_info.t)
   {
     hit_info = cur_hit_info;
-    // transform normals
+    // transform position and normals
+    hit_info.pos = spatial_conf.transform_pos(hit_info.pos);
     hit_info.geometric_normal = spatial_conf.transform_dir(hit_info.geometric_normal);
     hit_info.normal = spatial_conf.transform_dir(hit_info.normal);
     hit_info.material_idx = material_idx;
