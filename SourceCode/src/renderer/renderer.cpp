@@ -47,10 +47,12 @@ void Renderer::render()
   else
   {
     ImageSeries image_series(output_name, resolution, FileType::png);
+    uint32_t frame_idx = 0;
     while (scene->step())
     {
       std::vector<Color> pixels = render_frame();
-      image_series.save_image(pixels);
+      image_series.save_image(pixels, frame_idx);
+      frame_idx++;
     }
   }
 }

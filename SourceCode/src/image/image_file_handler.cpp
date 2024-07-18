@@ -80,14 +80,14 @@ void load_image(const std::string& path, std::vector<uint32_t>& bitmap, cm::Vec2
   stbi_image_free(pixels);
 }
 
-ImageSeries::ImageSeries(const std::string& directory, const cm::Vec2u resolution, FileType type) : dir("../../Images/" + directory), resolution(resolution), type(type), image_idx(0)
+ImageSeries::ImageSeries(const std::string& directory, const cm::Vec2u resolution, FileType type) : dir("../../Images/" + directory), resolution(resolution), type(type)
 {
   if (!std::filesystem::exists(dir)) std::filesystem::create_directory(dir);
 }
 
-void ImageSeries::save_image(const std::vector<Color>& pixels)
+void ImageSeries::save_image(const std::vector<Color>& pixels, uint32_t frame_idx)
 {
-  std::filesystem::path path(dir / std::to_string(image_idx++));
+  std::filesystem::path path(dir / std::to_string(frame_idx));
   write_image(pixels, path.string(), resolution, type);
 }
 

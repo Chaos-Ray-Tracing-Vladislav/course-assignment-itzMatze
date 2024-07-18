@@ -19,11 +19,10 @@ class ImageSeries
 {
 public:
   ImageSeries(const std::string& directory, const cm::Vec2u resolution, FileType type = FileType::png);
-  void save_image(const std::vector<Color>& pixels);
+  void save_image(const std::vector<Color>& pixels, uint32_t frame_idx);
 private:
   const std::filesystem::path dir;
   const cm::Vec2u resolution;
   const FileType type;
-  uint32_t image_idx;
 };
 
