@@ -21,6 +21,11 @@ cm::Vec3 Light::get_position() const
   return position;
 }
 
+void Light::set_position(const cm::Vec3& position)
+{
+  this->position = position;
+}
+
 float Light::set_intensity(float new_intensity)
 {
   return intensity = new_intensity;
