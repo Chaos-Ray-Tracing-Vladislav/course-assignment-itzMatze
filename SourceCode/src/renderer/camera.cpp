@@ -4,7 +4,7 @@
 #include "util/vec.hpp"
 
 CameraConfig::CameraConfig() :
-  spatial_conf(cm::rotate(cm::Vec3(0.0, 0.0, 0.0)), cm::Vec3(0.0, 0.0, 0.0)),
+  spatial_conf(cm::Vec3(0.0, 0.0, 0.0)),
   focal_length(0.03) /* 30mm camera lens */,
   sensor_size(0.036) /* standard full frame sensor width 36mm */
 {}
