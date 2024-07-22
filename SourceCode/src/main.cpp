@@ -20,7 +20,7 @@ int main(int argc, char** argv)
   Renderer renderer;
   const uint32_t thread_count = std::thread::hardware_concurrency();
   std::cerr << "Using " << thread_count << " threads" << std::endl;
-#if 1
+#if 0
   // render all scenes
   for (uint32_t i = 0; i < 3; i++)
   {
@@ -38,7 +38,14 @@ int main(int argc, char** argv)
   scene_file.scene = std::make_shared<Scene>(create_pyramid_star_scene());
   scene_file.settings.resolution = cm::Vec2u(1920, 1080);
   scene_file.settings.bucket_size = 20;
-  renderer.init(scene_file, "pyramid_star");
+  renderer.init(scene_file, "pyramid_star", thread_count);
+  renderer.render();
+#endif
+#if 1
+  scene_file.scene = std::make_shared<Scene>(create_progression_video_scene());
+  scene_file.settings.resolution = cm::Vec2u(1920, 1080);
+  scene_file.settings.bucket_size = 20;
+  renderer.init(scene_file, "progression", thread_count);
   renderer.render();
 #endif
   return 0;
