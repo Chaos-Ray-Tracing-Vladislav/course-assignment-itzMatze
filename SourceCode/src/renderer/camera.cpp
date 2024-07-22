@@ -40,5 +40,5 @@ Camera::Camera(const CameraConfig& config)
 Ray Camera::get_ray(const cm::Vec2 pixel) const
 {
   const cm::Vec3 pixel_pos = upper_left_corner + (pixel.x * sensor_size * spatial_conf.get_x_axis()) - (pixel.y * sensor_size * spatial_conf.get_y_axis());
-  return Ray(spatial_conf.get_position(), pixel_pos - spatial_conf.get_position());
+  return Ray(spatial_conf.get_position(), cm::normalize(pixel_pos - spatial_conf.get_position()));
 }
