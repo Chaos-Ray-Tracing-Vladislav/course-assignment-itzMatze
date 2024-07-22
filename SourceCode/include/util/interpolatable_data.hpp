@@ -26,15 +26,15 @@ public:
       assert(ids[i - 1] < ids[i]);
     }
 #endif
+    next_id = ids.size() > 0 ? ids.back() + 1 : 0;
   }
 
   uint32_t add_new_data(const T& datum)
   {
     // assign ascending indices to objects
-    uint32_t id = ids.size() == 0 ? 0 : ids.back() + 1;
     data.emplace_back(datum);
-    ids.emplace_back(id);
-    return id;
+    ids.emplace_back(next_id++);
+    return ids.back();
   }
 
   T& get_element(uint32_t id)
@@ -69,6 +69,7 @@ public:
 private:
   std::vector<T> data;
   std::vector<uint32_t> ids;
+  uint32_t next_id;
 };
 
 template<typename T>
