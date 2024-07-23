@@ -1,7 +1,7 @@
 #pragma once
 
 #include "renderer/ray.hpp"
-#include "util/vec.hpp"
+#include "util/vec3.hpp"
 
 class AABB
 {

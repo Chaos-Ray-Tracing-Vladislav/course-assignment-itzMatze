@@ -9,7 +9,7 @@
 #include "scene/scene_factory.hpp"
 #include "scene/scene_file_handler.hpp"
 #include "util/timer.hpp"
-#include "util/vec.hpp"
+#include "util/vec2.hpp"
 
 static constexpr cm::Vec2u resolution(1920, 1080);
 

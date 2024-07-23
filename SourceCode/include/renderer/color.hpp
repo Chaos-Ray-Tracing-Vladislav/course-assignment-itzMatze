@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include "util/vec.hpp"
+#include "util/vec3.hpp"
 
 class Color
 {

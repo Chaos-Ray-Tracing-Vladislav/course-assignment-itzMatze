@@ -5,6 +5,7 @@
 #include "renderer/color.hpp"
 #include "scene/scene_file_handler.hpp"
 #include "util/random_generator.hpp"
+#include "util/vec2.hpp"
 
 void Renderer::init(const SceneFile& scene_file, const std::string& name, uint32_t thread_count)
 {

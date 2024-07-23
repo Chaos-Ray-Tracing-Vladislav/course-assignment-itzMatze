@@ -1,6 +1,6 @@
 #pragma once
 #include "scene/scene.hpp"
-#include "util/vec.hpp"
+#include "util/vec2.hpp"
 
 struct Settings
 {

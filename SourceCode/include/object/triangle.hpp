@@ -5,7 +5,7 @@
 #include "object/vertex.hpp"
 #include "renderer/hit_info.hpp"
 #include "renderer/ray.hpp"
-#include "util/vec.hpp"
+#include "util/vec3.hpp"
 
 class Triangle
 {

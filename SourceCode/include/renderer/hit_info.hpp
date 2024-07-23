@@ -1,7 +1,8 @@
 #pragma once
 
 #include <limits>
-#include "util/vec.hpp"
+#include "util/vec2.hpp"
+#include "util/vec3.hpp"
 
 struct HitInfo
 {

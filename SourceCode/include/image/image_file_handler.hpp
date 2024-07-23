@@ -4,7 +4,7 @@
 #include <vector>
 #include <filesystem>
 #include "renderer/color.hpp"
-#include "util/vec.hpp"
+#include "util/vec2.hpp"
 
 enum class FileType
 {

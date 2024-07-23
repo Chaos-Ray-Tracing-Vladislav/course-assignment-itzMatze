@@ -3,7 +3,7 @@
 #include "renderer/color.hpp"
 #include "scene/scene.hpp"
 #include "scene/scene_file_handler.hpp"
-#include "util/vec.hpp"
+#include "util/vec2.hpp"
 
 class Renderer
 {
