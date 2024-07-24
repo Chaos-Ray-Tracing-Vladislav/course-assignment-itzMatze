@@ -1,6 +1,11 @@
 #pragma once
 #include "vec.hpp"
 #include <ostream>
+#undef SSE_ENABLED
+#ifdef SSE_ENABLED
+#include <xmmintrin.h>
+#include <smmintrin.h>
+#endif
 
 // chaos math
 namespace cm {
@@ -21,6 +26,9 @@ struct Vec<T, 3>
       values[i++] = val;
     }
   }
+#if defined(SSE_ENABLED)
+  constexpr Vec(const __m128& data) : data(data) {}
+#endif
 
   template<typename T2>
   T& operator[](const T2 idx) requires(std::is_integral<T2>::value)
@@ -61,6 +69,9 @@ struct Vec<T, 3>
   }
 
   union {
+#if defined(SSE_ENABLED)
+    __m128 data;
+#endif
     // align data to cache lines
     T values[4];
     struct {
@@ -74,6 +85,72 @@ std::ostream& operator<<(std::ostream& out, const Vec<T, 3>& a)
 {
   out << std::fixed << "(" << a.x << ", " << a.y << ", " << a.z << ")";
   return out;
+}
+
+#if defined(SSE_ENABLED)
+inline Vec<float, 3> operator+(const Vec<float, 3>& a, const Vec<float, 3>& b)
+{
+  return Vec<float, 3>(_mm_add_ps(a.data, b.data));
+}
+
+inline Vec<float, 3> operator-(const Vec<float, 3>& a, const Vec<float, 3>& b)
+{
+  return Vec<float, 3>(_mm_sub_ps(a.data, b.data));
+}
+
+inline Vec<float, 3> operator*(const Vec<float, 3>& a, const Vec<float, 3>& b)
+{
+  return Vec<float, 3>(_mm_mul_ps(a.data, b.data));
+}
+
+inline Vec<float, 3> operator/(const Vec<float, 3>& a, const Vec<float, 3>& b)
+{
+  return Vec<float, 3>(_mm_div_ps(a.data, b.data));
+}
+
+inline Vec<float, 3> min(const Vec<float, 3>& a, const Vec<float, 3>& b)
+{
+  return Vec<float, 3>(_mm_min_ps(a.data, b.data));
+}
+
+inline Vec<float, 3> max(const Vec<float, 3>& a, const Vec<float, 3>& b)
+{
+  return Vec<float, 3>(_mm_max_ps(a.data, b.data));
+}
+
+inline float dot(const Vec<float, 3>& a, const Vec<float, 3>& b)
+{
+  __m128 result = _mm_dp_ps(a.data, b.data, 0x71);
+  return _mm_cvtss_f32(result);
+}
+#endif // SSE_ENABLED
+
+inline float min_component(const Vec<float, 3>& a)
+{
+  if (a.x < a.y)
+  {
+    if (a.x < a.z) return a.x;
+    else return a.z;
+  }
+  else
+  {
+    if (a.y < a.z) return a.y;
+    else return a.z;
+  }
+}
+
+inline float max_component(const Vec<float, 3>& a)
+{
+  if (a.x > a.y)
+  {
+    if (a.x > a.z) return a.x;
+    else return a.z;
+  }
+  else
+  {
+    if (a.y > a.z) return a.y;
+    else return a.z;
+  }
 }
 
 template<typename T>
