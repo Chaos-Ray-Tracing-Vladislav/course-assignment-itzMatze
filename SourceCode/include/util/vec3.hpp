@@ -61,7 +61,8 @@ struct Vec<T, 3>
   }
 
   union {
-    T values[3];
+    // align data to cache lines
+    T values[4];
     struct {
       T x, y, z;
     };

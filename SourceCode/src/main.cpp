@@ -42,11 +42,15 @@ int main(int argc, char** argv)
   renderer.render();
 #endif
 #if 1
+  Timer t;
   scene_file.scene = std::make_shared<Scene>(create_progression_video_scene());
   scene_file.settings.resolution = cm::Vec2u(1920, 1080);
   scene_file.settings.bucket_size = 20;
+  std::cout << "Scene created: " << t.restart<std::milli>() << "ms" << std::endl;
   renderer.init(scene_file, "progression", thread_count);
+  std::cout << "Renderer initialized: " << t.restart<std::milli>() << "ms" << std::endl;
   renderer.render();
+  std::cout << "Rendering finished: " << t.restart<std::milli>() << "ms" << std::endl;
 #endif
   return 0;
 }

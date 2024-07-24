@@ -71,16 +71,20 @@ Vec<T1, N> operator+(const Vec<T1, N>& a, const T2 b)
   return Vec<T1, N>(vals);
 }
 
-template<typename T, int N>
-Vec<T, N> operator-(const Vec<T, N>& a, const Vec<T, N>& b)
+template<typename T1, typename T2, int N>
+Vec<T1, N> operator-(const Vec<T1, N>& a, const Vec<T2, N>& b)
 {
-  return operator+(a, -b);
+  T1 vals[N];
+  for (uint32_t i = 0; i < N; i++) vals[i] = a.values[i] - T1(b.values[i]);
+  return Vec<T1, N>(vals);
 }
 
 template<typename T1, typename T2, int N>
 Vec<T1, N> operator-(const Vec<T1, N>& a, const T2 b)
 {
-  return operator+(a, -b);
+  T1 vals[N];
+  for (uint32_t i = 0; i < N; i++) vals[i] = a.values[i] - T1(b);
+  return Vec<T1, N>(vals);
 }
 
 template<typename T, int N>
@@ -116,6 +120,14 @@ Vec<T1, N> operator/(const T2 a, const Vec<T1, N>& b)
 }
 
 template<typename T1, typename T2, int N>
+Vec<T1, N> operator*(const Vec<T1, N>& a, const Vec<T2, N>& b)
+{
+  T1 vals[N];
+  for (uint32_t i = 0; i < N; i++) vals[i] = a.values[i] * T1(b.values[i]);
+  return Vec<T1, N>(vals);
+}
+
+template<typename T1, typename T2, int N>
 Vec<T1, N> operator*(const Vec<T1, N>& a, const T2 b)
 {
   T1 vals[N];
@@ -127,14 +139,6 @@ template<typename T1, typename T2, int N>
 Vec<T1, N> operator*(const T2 a, const Vec<T1, N>& b)
 {
   return operator*(b, a);
-}
-
-template<typename T1, typename T2, int N>
-Vec<T1, N> operator*(const Vec<T1, N>& a, const Vec<T2, N>& b)
-{
-  T1 vals[N];
-  for (uint32_t i = 0; i < N; i++) vals[i] = a.values[i] * T1(b.values[i]);
-  return Vec<T1, N>(vals);
 }
 
 template<typename T, int N>
@@ -190,9 +194,7 @@ float dot(const Vec<T, N>& a, const Vec<T, N>& b)
 template<typename T, int N>
 float length(const Vec<T, N>& a)
 {
-  float result = 0.0;
-  for (uint32_t i = 0; i < N; i++) result += a.values[i] * a.values[i];
-  return std::sqrt(result);
+  return std::sqrt(dot(a, a));
 }
 
 template<typename T, int N>
