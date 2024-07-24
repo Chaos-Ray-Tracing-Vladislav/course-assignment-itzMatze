@@ -8,8 +8,14 @@
 class Renderer
 {
 public:
+  struct Settings
+  {
+    uint32_t thread_count = 1;
+    uint32_t max_path_length = 16;
+    bool use_jittering = false;
+  };
   Renderer() = default;
-  void init(const SceneFile& scene_file, const std::string& name, uint32_t thread_count = 1);
+  void init(const SceneFile& scene_file, const std::string& name, const Settings& settings);
   void render();
 
 private:
@@ -22,9 +28,8 @@ private:
   std::shared_ptr<Scene> scene;
   cm::Vec2u resolution;
   std::string output_name;
-  bool use_jittering = false;
   std::vector<ImageBucket> buckets;
-  uint32_t thread_count;
+  Settings settings;
 
   std::vector<Color> render_frame() const;
   void render_buckets(std::vector<Color>* pixels, std::atomic<uint32_t>* bucket_idx) const;

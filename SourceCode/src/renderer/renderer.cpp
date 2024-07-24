@@ -7,9 +7,9 @@
 #include "util/random_generator.hpp"
 #include "util/vec2.hpp"
 
-void Renderer::init(const SceneFile& scene_file, const std::string& name, uint32_t thread_count)
+void Renderer::init(const SceneFile& scene_file, const std::string& name, const Settings& settings)
 {
-  this->thread_count = thread_count;
+  this->settings = settings;
   scene = scene_file.scene;
   resolution = scene_file.settings.resolution;
   output_name = name;
@@ -62,14 +62,14 @@ std::vector<Color> Renderer::render_frame() const
 {
   std::vector<Color> pixels(resolution.x * resolution.y);
   std::atomic<uint32_t> bucket_idx = 0;
-  if (thread_count < 2)
+  if (settings.thread_count < 2)
   {
     render_buckets(&pixels, &bucket_idx);
   }
   else
   {
     std::vector<std::jthread> threads;
-    for (uint32_t i = 0; i < thread_count; i++) threads.push_back(std::jthread(&Renderer::render_buckets, this, &pixels, &bucket_idx));
+    for (uint32_t i = 0; i < settings.thread_count; i++) threads.push_back(std::jthread(&Renderer::render_buckets, this, &pixels, &bucket_idx));
   }
   return pixels;
 }
@@ -109,7 +109,7 @@ void Renderer::render_buckets(std::vector<Color>* pixels, std::atomic<uint32_t>*
             for (const auto& bsdf_sample : bsdf_samples)
             {
               const uint32_t depth = path_vertex.depth + 1;
-              if (depth < 16)
+              if (depth < settings.max_path_length)
               {
                 const PathVertex next_path_vertex = PathVertex{bsdf_sample.ray, path_vertex.attenuation * bsdf_sample.attenuation, depth};
                 path_vertices.push_back(next_path_vertex);
@@ -157,7 +157,7 @@ void Renderer::render_buckets(std::vector<Color>* pixels, std::atomic<uint32_t>*
 cm::Vec2 Renderer::get_camera_coordinates(cm::Vec2u pixel) const
 {
   // offset to either get a random position inside of the pixel square or the center of the pixel
-  cm::Vec2 offset = use_jittering ? cm::Vec2(rng::random_float(), rng::random_float()) : cm::Vec2(0.5);
+  cm::Vec2 offset = settings.use_jittering ? cm::Vec2(rng::random_float(), rng::random_float()) : cm::Vec2(0.5);
   cm::Vec2 pixel_coordinates = (cm::Vec2(pixel) + offset) / cm::Vec2(resolution);
   float aspect_ratio = float(resolution.y) / float(resolution.x);
   pixel_coordinates.y *= aspect_ratio;
