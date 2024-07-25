@@ -1,5 +1,7 @@
 #include "renderer/renderer.hpp"
+#include "util/timer.hpp"
 #include <atomic>
+#include <iostream>
 #include <thread>
 #include "image/image_file_handler.hpp"
 #include "renderer/color.hpp"
@@ -51,7 +53,9 @@ void Renderer::render()
     uint32_t frame_idx = 0;
     while (scene->step())
     {
+      Timer t;
       std::vector<Color> pixels = render_frame();
+      std::cout << "frametime " << frame_idx << ": " << t.restart<std::milli>() << "ms" << std::endl;
       image_series.save_image(pixels, frame_idx);
       frame_idx++;
     }
