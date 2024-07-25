@@ -203,6 +203,27 @@ Vec<T, N> normalize(const Vec<T, N>& a) requires(std::is_floating_point<T>::valu
   return a / length(a);
 }
 
+template<typename T, int N>
+Vec<T, N> abs(const Vec<T, N>& a)
+{
+  T values[N];
+  for (uint32_t i = 0; i < N; i++) values[i] = std::abs(a.values[i]);
+  return Vec<T, N>(values);
+}
+
+template<typename T, int N>
+Vec<T, N> sign(const Vec<T, N>& a)
+{
+  T values[N];
+  for (uint32_t i = 0; i < N; i++)
+  {
+    if (a.values[i] < T(0)) values[i] = T(-1);
+    else if (a.values[i] > T(0)) values[i] = T(1);
+    else values[i] = T(0);
+  }
+  return Vec<T, N>(values);
+}
+
 template<typename T1, typename T2, int N>
 Vec<T1, N> pow(const Vec<T1, N>& a, const T2 b)
 {
