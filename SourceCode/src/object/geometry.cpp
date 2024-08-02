@@ -1,31 +1,22 @@
 #include "object/geometry.hpp"
+#include <limits>
 #include <vector>
 #include "util/interpolatable_data.hpp"
 
 Geometry::Geometry(const InterpolatableData<Object>& objects, const std::vector<Material>& materials) : objects(objects), materials(materials)
-{}
-
-uint32_t Geometry::add_object(const Object& object)
 {
-  return objects.add_new_data(object);
-}
-
-void Geometry::add_material(const Material& material)
-{
-  materials.emplace_back(material);
-}
-
-const std::vector<Object>& Geometry::get_objects() const
-{
-  return objects.get_data();
+  cm::Vec3 min = cm::Vec3(std::numeric_limits<float>::max());
+  cm::Vec3 max = cm::Vec3(std::numeric_limits<float>::min());
+  for (const auto& object : objects.get_data())
+  {
+    const AABB object_bounding_box = object.get_world_space_aabb();
+    min = cm::min(object_bounding_box.min, min);
+    max = cm::max(object_bounding_box.max, max);
+  }
+  bounding_box = AABB(min, max);
 }
 
 const InterpolatableData<Object>& Geometry::get_interpolatable_objects() const
-{
-  return objects;
-}
-
-InterpolatableData<Object>& Geometry::get_interpolatable_objects()
 {
   return objects;
 }
@@ -37,6 +28,7 @@ const std::vector<Material>& Geometry::get_materials() const
 
 bool Geometry::intersect(const Ray& ray, HitInfo& hit_info) const
 {
+  if (!bounding_box.intersect(ray)) return false;
   hit_info.t = ray.config.max_t;
   HitInfo cur_hit_info;
   for (const auto& object : objects.get_data())

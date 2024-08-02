@@ -36,6 +36,7 @@ class Material
 public:
   Material();
   Material(MaterialType type, const MaterialParameters& params);
+  cm::Vec3 get_albedo(const HitInfo& hit_info) const;
   cm::Vec3 eval(const HitInfo& hit_info, const cm::Vec3& incident_dir, const cm::Vec3& outgoing_dir) const;
   std::vector<BSDFSample> get_bsdf_samples(const HitInfo& hit_info, const cm::Vec3& incident_dir) const;
   // is material dirac delta reflective or refractive

@@ -1,13 +1,38 @@
 #include "renderer/renderer.hpp"
+#include <atomic>
+#include <thread>
 #include "image/image_file_handler.hpp"
 #include "renderer/color.hpp"
+#include "scene/scene_file_handler.hpp"
 #include "util/random_generator.hpp"
 
-void Renderer::init(const Scene& scene, const cm::Vec2u resolution, const std::string& name)
+void Renderer::init(const SceneFile& scene_file, const std::string& name, uint32_t thread_count)
 {
-  this->scene = scene;
-  this->resolution = resolution;
+  this->thread_count = thread_count;
+  scene = scene_file.scene;
+  resolution = scene_file.settings.resolution;
   output_name = name;
+
+  // divide image into buckets that can be rendered concurrently
+  const cm::Vec2u bucket_count = (resolution / scene_file.settings.bucket_size);
+  const cm::Vec2u bucket_size = cm::Vec2u(scene_file.settings.bucket_size, scene_file.settings.bucket_size);
+  // add one overflow bucket if the buckets do not fit the resolution
+  const cm::Vec2u overflow_bucket_size = cm::Vec2u(resolution.x % scene_file.settings.bucket_size, resolution.y % scene_file.settings.bucket_size);
+  for (uint32_t x = 0; x < bucket_count.x; x++)
+  {
+    for (uint32_t y = 0; y < bucket_count.y; y++)
+    {
+      buckets.emplace_back(bucket_size * cm::Vec2u(x, y), bucket_size * cm::Vec2u(x + 1, y + 1));
+    }
+    if (overflow_bucket_size.x > 0) buckets.emplace_back(bucket_size * cm::Vec2u(x, bucket_count.y), bucket_size * cm::Vec2u(x + 1, bucket_count.y + overflow_bucket_size.y));
+  }
+  if (overflow_bucket_size.y > 0)
+  {
+    for (uint32_t y = 0; y < bucket_count.y; y++)
+    {
+      buckets.emplace_back(bucket_size * cm::Vec2u(bucket_count.x, y), bucket_size * cm::Vec2u(bucket_count.x + overflow_bucket_size.x, y));
+    }
+  }
 }
 
 void Renderer::render()
@@ -30,6 +55,22 @@ void Renderer::render()
 
 std::vector<Color> Renderer::render_frame() const
 {
+  std::vector<Color> pixels(resolution.x * resolution.y);
+  std::atomic<uint32_t> bucket_idx = 0;
+  if (thread_count < 2)
+  {
+    render_buckets(&pixels, &bucket_idx);
+  }
+  else
+  {
+    std::vector<std::jthread> threads;
+    for (uint32_t i = 0; i < thread_count; i++) threads.push_back(std::jthread(&Renderer::render_buckets, this, &pixels, &bucket_idx));
+  }
+  return pixels;
+}
+
+void Renderer::render_buckets(std::vector<Color>* pixels, std::atomic<uint32_t>* bucket_idx) const
+{
   // store all rays that need to be traced, their accumulated attenuation, and their depth
   struct PathVertex
   {
@@ -38,77 +79,87 @@ std::vector<Color> Renderer::render_frame() const
     uint32_t depth;
   };
   std::vector<PathVertex> path_vertices;
-
-  std::vector<Color> pixels(resolution.x * resolution.y);
   HitInfo hit_info;
-  for (uint32_t y = 0; y < resolution.y; y++)
+  // atomically get next bucket index in each iteration and check whether the index is still valid
+  for (uint32_t local_bucket_idx = bucket_idx->fetch_add(1); local_bucket_idx < buckets.size(); local_bucket_idx = bucket_idx->fetch_add(1))
   {
-    for (uint32_t x = 0; x < resolution.x; x++)
+    const ImageBucket bucket = buckets[local_bucket_idx];
+    for (uint32_t y = bucket.min.y; y < bucket.max.y; y++)
     {
-      path_vertices.clear();
-      // add initial vertex of the camera
-      path_vertices.push_back(PathVertex{scene.get_camera().get_ray(get_camera_coordinates({x, y})), cm::Vec3(1.0, 1.0, 1.0), 0});
-      Color color(0.0, 0.0, 0.0);
-      // trace rays as long as there are rays left to trace
-      while (!path_vertices.empty())
+      for (uint32_t x = bucket.min.x; x < bucket.max.x; x++)
       {
-        PathVertex path_vertex = path_vertices.back();
-        path_vertices.pop_back();
-        if (scene.get_geometry().intersect(path_vertex.ray, hit_info))
+        path_vertices.clear();
+        // add initial vertex of the camera
+        path_vertices.push_back(PathVertex{scene.get_camera().get_ray(get_camera_coordinates({x, y})), cm::Vec3(1.0, 1.0, 1.0), 0});
+        Color color(0.0, 0.0, 0.0);
+        // trace rays as long as there are rays left to trace
+        while (!path_vertices.empty())
         {
+          PathVertex path_vertex = path_vertices.back();
+          path_vertices.pop_back();
+          if (scene.get_geometry().intersect(path_vertex.ray, hit_info))
+          {
 #if 0
-          // barycentric coordinates debug visualization
-          color = Color(hit_info.bary.u, hit_info.bary.v, 1.0);
-          break;
+            // barycentric coordinates debug visualization
+            color = Color(hit_info.bary.u, hit_info.bary.v, 1.0);
+            break;
 #elif 0
-          // normal debug visualization
-          color = Color((hit_info.normal + 1.0) / 2.0);
-          break;
+            // normal debug visualization
+            color = Color((hit_info.normal + 1.0) / 2.0);
+            break;
 #elif 0
-          // texture coordinates debug visualization
-          color = Color(hit_info.tex_coords.u, hit_info.tex_coords.v, 1.0);
-          break;
+            // texture coordinates debug visualization
+            color = Color(hit_info.tex_coords.u, hit_info.tex_coords.v, 1.0);
+            break;
 #else
-          Material material = (hit_info.material_idx == -1) ? Material() : scene.get_geometry().get_materials()[hit_info.material_idx];
-          // if material is dirac delta reflective or there are no lights there is no need to evaluate lighting
-          if (!material.is_delta() && scene.get_lights().size() > 0)
-          {
-            for (const auto& light : scene.get_lights())
+            Material material = (hit_info.material_idx == -1) ? Material() : scene.get_geometry().get_materials()[hit_info.material_idx];
+            std::vector<BSDFSample> bsdf_samples = material.get_bsdf_samples(hit_info, path_vertex.ray.get_dir());
+            for (const auto& bsdf_sample : bsdf_samples)
             {
-              const cm::Vec3 outgoing_dir = cm::normalize(light.get_position() - hit_info.pos);
-              const float light_distance = cm::length(light.get_position() - hit_info.pos);
-              // trace shadow ray with small offset in the direction of the normal to avoid shadow acne
-              const Ray shadow_ray(hit_info.pos + RAY_START_OFFSET * hit_info.geometric_normal, outgoing_dir, RayConfig{.max_t = light_distance, .anyhit = true, .backface_culling = false});
-              HitInfo shadow_hit_info;
-              if (scene.get_geometry().intersect(shadow_ray, shadow_hit_info)) continue;
-              const float light_surface = 4.0 * M_PI * light_distance * light_distance;
-              cm::Vec3 contribution = cm::Vec3(light.get_intensity() / light_surface);
-              contribution *= path_vertex.attenuation * material.eval(hit_info, path_vertex.ray.dir, outgoing_dir);
-              color.value += contribution;
+              const uint32_t depth = path_vertex.depth + 1;
+              if (depth < 16)
+              {
+                const PathVertex next_path_vertex = PathVertex{bsdf_sample.ray, path_vertex.attenuation * bsdf_sample.attenuation, depth};
+                path_vertices.push_back(next_path_vertex);
+              }
             }
-          }
-          std::vector<BSDFSample> bsdf_samples = material.get_bsdf_samples(hit_info, path_vertex.ray.dir);
-          for (const auto& bsdf_sample : bsdf_samples)
-          {
-            const uint32_t depth = path_vertex.depth + 1;
-            if (depth < 16)
+            // if material is dirac delta reflective or there are no lights there is no need to evaluate lighting
+            if (!material.is_delta())
             {
-              const PathVertex next_path_vertex = PathVertex{bsdf_sample.ray, path_vertex.attenuation * bsdf_sample.attenuation, depth};
-              path_vertices.push_back(next_path_vertex);
+              if (scene.get_lights().size() > 0)
+              {
+                for (const auto& light : scene.get_lights())
+                {
+                  const cm::Vec3 outgoing_dir = cm::normalize(light.get_position() - hit_info.pos);
+                  const float light_distance = cm::length(light.get_position() - hit_info.pos);
+                  // trace shadow ray with small offset in the direction of the normal to avoid shadow acne
+                  const Ray shadow_ray(hit_info.pos + RAY_START_OFFSET * hit_info.geometric_normal, outgoing_dir, RayConfig{.max_t = light_distance, .anyhit = true, .backface_culling = false});
+                  HitInfo shadow_hit_info;
+                  if (scene.get_geometry().intersect(shadow_ray, shadow_hit_info)) continue;
+                  const float light_surface = 4.0 * M_PI * light_distance * light_distance;
+                  cm::Vec3 contribution = cm::Vec3(light.get_intensity() / light_surface);
+                  contribution *= path_vertex.attenuation * material.eval(hit_info, path_vertex.ray.get_dir(), outgoing_dir);
+                  color.value += contribution;
+                }
+              }
+              else
+              {
+                color.value += material.get_albedo(hit_info);
+              }
             }
-          }
 #endif
-        }
-        else
+          }
+          else
         {
-          // background color
-          color.value += scene.get_background_color().value * path_vertex.attenuation;
+            // background color
+            color.value += scene.get_background_color().value * path_vertex.attenuation;
+          }
         }
+        // does not require synchronization because every thread writes different pixels
+        (*pixels)[y * resolution.x + x] = color;
       }
-      pixels[y * resolution.x + x] = color;
     }
   }
-  return pixels;
 }
 
 cm::Vec2 Renderer::get_camera_coordinates(cm::Vec2u pixel) const

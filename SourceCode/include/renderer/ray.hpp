@@ -16,9 +16,15 @@ class Ray
 public:
   Ray(const cm::Vec3& origin, const cm::Vec3& dir, const RayConfig config = RayConfig());
   cm::Vec3 at(float t) const;
+  const cm::Vec3& get_dir() const;
+  const cm::Vec3& get_inv_dir() const;
+  void set_dir(const cm::Vec3& dir);
 
   cm::Vec3 origin;
-  cm::Vec3 dir;
   RayConfig config;
+
+private:
+  cm::Vec3 dir;
+  cm::Vec3 inv_dir;
 };
 

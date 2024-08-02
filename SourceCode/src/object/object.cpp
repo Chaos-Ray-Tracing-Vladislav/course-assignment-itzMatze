@@ -37,6 +37,18 @@ const std::vector<Vertex>& Object::get_vertices() const
   return vertices;
 }
 
+AABB Object::get_world_space_aabb() const
+{
+  cm::Vec3 min = cm::Vec3(std::numeric_limits<float>::max());
+  cm::Vec3 max = cm::Vec3(std::numeric_limits<float>::min());
+  for (const auto& vertex : vertices)
+  {
+    min = cm::min(vertex.pos, min);
+    max = cm::max(vertex.pos, max);
+  }
+  return AABB(spatial_conf.transform_pos(min), spatial_conf.transform_pos(max));
+}
+
 const SpatialConfiguration& Object::get_spatial_conf() const
 {
   return spatial_conf;
@@ -51,7 +63,7 @@ bool Object::intersect(const Ray& ray, HitInfo& hit_info) const
 {
   HitInfo cur_hit_info;
   // transform ray into local coordinate system of object
-  const Ray transformed_ray(spatial_conf.inverse_transform_pos(ray.origin), spatial_conf.inverse_transform_dir(ray.dir), ray.config);
+  const Ray transformed_ray(spatial_conf.inverse_transform_pos(ray.origin), spatial_conf.inverse_transform_dir(ray.get_dir()), ray.config);
   for (const auto& triangle : triangles)
   {
     // test if object is intersected and if yes whether the intersection is closer than the previous ones

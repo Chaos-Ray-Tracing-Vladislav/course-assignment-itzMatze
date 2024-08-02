@@ -22,7 +22,7 @@ bool Triangle::intersect(const Ray& ray, HitInfo& hit_info, const std::vector<Ve
   const Vertex& v0 = vertices[vertex_indices[0]];
   const Vertex& v1 = vertices[vertex_indices[1]];
   const Vertex& v2 = vertices[vertex_indices[2]];
-  const float dot_n_dir = cm::dot(ray.dir, geometric_normal);
+  const float dot_n_dir = cm::dot(ray.get_dir(), geometric_normal);
   // backface culling
   if (ray.config.backface_culling && dot_n_dir >= 0.0) return false;
   hit_info.t = (cm::dot(geometric_normal, v0.pos) - cm::dot(ray.origin, geometric_normal)) / dot_n_dir;
