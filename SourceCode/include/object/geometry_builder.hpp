@@ -13,8 +13,10 @@ public:
   GeometryBuilder(const InterpolatableData<Object>& objects, const std::vector<Material>& materials);
 
   uint32_t add_object(const Object& object);
-  void add_material(const Material& material);
+  uint32_t add_material(const Material& material);
   InterpolatableData<Object>& get_interpolatable_objects();
+  Object& get_object(uint32_t id);
+  void remove_object(uint32_t id);
   Geometry build_geometry();
 
 private:

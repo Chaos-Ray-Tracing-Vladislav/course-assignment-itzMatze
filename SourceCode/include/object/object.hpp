@@ -12,6 +12,7 @@
 class Object
 {
 public:
+  Object() = default;
   Object(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const SpatialConfiguration& spatial_conf, int32_t material_idx = -1, bool compute_normals = false);
   Object(const std::shared_ptr<std::vector<Vertex>> vertices, const std::vector<Triangle>& triangles, const SpatialConfiguration& spatial_conf, int32_t material_idx = -1);
   const std::vector<Triangle>& get_triangles() const;
@@ -23,12 +24,13 @@ public:
   bool intersect(const Ray& ray, HitInfo& hit_info) const;
   bool intersect(const AABB& aabb) const;
 
+  int32_t material_idx;
+
 private:
   SpatialConfiguration spatial_conf;
   std::shared_ptr<std::vector<Vertex>> vertices;
   std::vector<Triangle> triangles;
   BVH<Triangle> bvh;
-  int32_t material_idx;
 };
 
 Object interpolate(const Object& a, const Object& b, float weight);

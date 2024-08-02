@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.19)
 project(Chaos)
 set(CMAKE_CXX_STANDARD 20)
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  add_compile_options(-msse4.2)
+  add_compile_definitions(SSE_ENABLED)
+endif()
+
 set(SOURCE_FILES
   src/image/image_factory.cpp
   src/image/image_file_handler.cpp
@@ -33,4 +38,7 @@ target_include_directories(Chaos PRIVATE "${PROJECT_SOURCE_DIR}/include"
 
 add_executable(hw04 src/hw04.cpp)
 target_include_directories(hw04 PRIVATE "${PROJECT_SOURCE_DIR}/include")
+
+add_executable(vec_perf_test src/vec_perf_test.cpp)
+target_include_directories(vec_perf_test PRIVATE "${PROJECT_SOURCE_DIR}/include")
 

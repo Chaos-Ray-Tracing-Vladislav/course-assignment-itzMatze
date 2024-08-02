@@ -1,7 +1,8 @@
 #pragma once
 #include "renderer/ray.hpp"
 #include "util/spatial_configuration.hpp"
-#include "util/vec.hpp"
+#include "util/vec2.hpp"
+#include "util/vec3.hpp"
 
 class CameraConfig
 {

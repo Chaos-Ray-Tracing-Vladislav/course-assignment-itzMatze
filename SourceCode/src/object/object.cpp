@@ -71,9 +71,10 @@ bool Object::intersect(const Ray& ray, HitInfo& hit_info) const
   if (cur_hit_info.t < hit_info.t)
   {
     hit_info = cur_hit_info;
-    // transform normals
-    hit_info.geometric_normal = spatial_conf.transform_dir(hit_info.geometric_normal);
-    hit_info.normal = spatial_conf.transform_dir(hit_info.normal);
+    // transform position and normals
+    hit_info.pos = spatial_conf.transform_pos(hit_info.pos);
+    hit_info.geometric_normal = cm::normalize(spatial_conf.transform_dir(hit_info.geometric_normal));
+    hit_info.normal = cm::normalize(spatial_conf.transform_dir(hit_info.normal));
     hit_info.material_idx = material_idx;
     return true;
   }
@@ -89,5 +90,5 @@ bool Object::intersect(const AABB& aabb) const
 Object interpolate(const Object& a, const Object& b, float weight)
 {
   SpatialConfiguration spatial_conf = interpolate(a.get_spatial_conf(), b.get_spatial_conf(), weight);
-  return Object(a.get_vertices(), a.get_triangles(), spatial_conf);
+  return Object(a.get_vertices(), a.get_triangles(), spatial_conf, a.material_idx);
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include <limits>
-#include "util/vec.hpp"
+#include "util/vec3.hpp"
 
 #define RAY_START_OFFSET 0.0001
 

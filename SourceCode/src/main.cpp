@@ -9,7 +9,7 @@
 #include "scene/scene_factory.hpp"
 #include "scene/scene_file_handler.hpp"
 #include "util/timer.hpp"
-#include "util/vec.hpp"
+#include "util/vec2.hpp"
 
 static constexpr cm::Vec2u resolution(1920, 1080);
 
@@ -20,11 +20,11 @@ int main(int argc, char** argv)
   Renderer renderer;
   const uint32_t thread_count = std::thread::hardware_concurrency();
   std::cerr << "Using " << thread_count << " threads" << std::endl;
-#if 1
+#if 0
   // render all scenes
-  for (uint32_t i = 0; i < 2; i++)
+  for (uint32_t i = 0; i < 3; i++)
   {
-    std::string file("14/scene" + std::to_string(i) + ".crtscene");
+    std::string file("15/scene" + std::to_string(i) + ".crtscene");
     Timer t;
     if (load_scene_file(file, scene_file) != 0) return 1;
     std::cout << "Scene \"" << file << "\" loaded: " << t.restart<std::milli>() << "ms" << std::endl;
@@ -35,11 +35,22 @@ int main(int argc, char** argv)
   }
 #endif
 #if 0
-  scene_file.scene = create_pyramid_star_scene();
+  scene_file.scene = std::make_shared<Scene>(create_pyramid_star_scene());
   scene_file.settings.resolution = cm::Vec2u(1920, 1080);
   scene_file.settings.bucket_size = 20;
   renderer.init(scene_file, "pyramid_star", thread_count);
   renderer.render();
+#endif
+#if 1
+  Timer t;
+  scene_file.scene = std::make_shared<Scene>(create_progression_video_scene());
+  scene_file.settings.resolution = cm::Vec2u(1920, 1080);
+  scene_file.settings.bucket_size = 20;
+  std::cout << "Scene created: " << t.restart<std::milli>() << "ms" << std::endl;
+  renderer.init(scene_file, "progression", {.thread_count = thread_count});
+  std::cout << "Renderer initialized: " << t.restart<std::milli>() << "ms" << std::endl;
+  renderer.render();
+  std::cout << "Rendering finished: " << t.restart<std::milli>() << "ms" << std::endl;
 #endif
   return 0;
 }

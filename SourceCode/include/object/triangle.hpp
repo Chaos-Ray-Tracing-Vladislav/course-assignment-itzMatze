@@ -5,7 +5,7 @@
 #include "object/vertex.hpp"
 #include "renderer/hit_info.hpp"
 #include "renderer/ray.hpp"
-#include "util/vec.hpp"
+#include "util/vec3.hpp"
 
 class Triangle
 {
@@ -16,7 +16,7 @@ public:
   AABB get_bounding_box() const;
 
   bool intersect(const Ray& ray, HitInfo& hit_info) const;
-  bool intersect(const AABB& aabb) const;
+  bool intersect(const AABB& aabb, bool accurate = true) const;
 
   std::shared_ptr<const std::vector<Vertex>> vertices;
   uint32_t vertex_indices[3];

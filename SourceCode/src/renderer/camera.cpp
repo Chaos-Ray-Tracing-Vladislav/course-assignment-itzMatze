@@ -4,7 +4,7 @@
 #include "util/vec.hpp"
 
 CameraConfig::CameraConfig() :
-  spatial_conf(cm::rotate(cm::Vec3(0.0, 0.0, 0.0)), cm::Vec3(0.0, 0.0, 0.0)),
+  spatial_conf(cm::Vec3(0.0, 0.0, 0.0)),
   focal_length(0.03) /* 30mm camera lens */,
   sensor_size(0.036) /* standard full frame sensor width 36mm */
 {}
@@ -40,5 +40,5 @@ Camera::Camera(const CameraConfig& config)
 Ray Camera::get_ray(const cm::Vec2 pixel) const
 {
   const cm::Vec3 pixel_pos = upper_left_corner + (pixel.x * sensor_size * spatial_conf.get_x_axis()) - (pixel.y * sensor_size * spatial_conf.get_y_axis());
-  return Ray(spatial_conf.get_position(), pixel_pos - spatial_conf.get_position());
+  return Ray(spatial_conf.get_position(), cm::normalize(pixel_pos - spatial_conf.get_position()));
 }

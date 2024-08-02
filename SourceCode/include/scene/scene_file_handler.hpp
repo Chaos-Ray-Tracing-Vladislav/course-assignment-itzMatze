@@ -1,6 +1,6 @@
 #pragma once
 #include "scene/scene.hpp"
-#include "util/vec.hpp"
+#include "util/vec2.hpp"
 
 struct Settings
 {
@@ -15,4 +15,5 @@ struct SceneFile
 };
 
 int load_scene_file(const std::string& file_path, SceneFile& scene_file);
+int load_object_file(const std::string& file_path, Object& object);
 

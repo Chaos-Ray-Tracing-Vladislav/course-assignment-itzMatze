@@ -2,7 +2,9 @@
 #include <algorithm>
 #include <cstdint>
 #include <cassert>
+#include <ostream>
 #include "vec.hpp"
+#include "vec3.hpp"
 
 // chaos math
 namespace cm {
@@ -42,7 +44,7 @@ struct Mat
       values[i++] = Vec<T, M>(column);
     }
   }
-  constexpr Mat(const std::initializer_list<cm::Vec3>& vals)
+  constexpr Mat(const std::initializer_list<cm::Vec<T, N>>& vals)
   {
     assert(vals.size() == M);
     uint32_t i = 0;

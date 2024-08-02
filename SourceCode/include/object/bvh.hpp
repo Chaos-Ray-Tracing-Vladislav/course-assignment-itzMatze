@@ -6,6 +6,7 @@
 #include <vector>
 #include "object/aabb.hpp"
 #include "renderer/hit_info.hpp"
+#include "util/vec3.hpp"
 
 template<typename T>
 class BVH

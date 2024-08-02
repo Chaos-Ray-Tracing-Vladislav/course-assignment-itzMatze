@@ -61,17 +61,66 @@ bool Triangle::intersect(const Ray& ray, HitInfo& hit_info) const
 AABB Triangle::get_bounding_box() const
 {
   AABB bounding_box;
-  bounding_box.min = cm::min(bounding_box.min, (*vertices)[vertex_indices[0]].pos);
-  bounding_box.min = cm::min(bounding_box.min, (*vertices)[vertex_indices[1]].pos);
-  bounding_box.min = cm::min(bounding_box.min, (*vertices)[vertex_indices[2]].pos);
-  bounding_box.max = cm::max(bounding_box.max, (*vertices)[vertex_indices[0]].pos);
-  bounding_box.max = cm::max(bounding_box.max, (*vertices)[vertex_indices[1]].pos);
-  bounding_box.max = cm::max(bounding_box.max, (*vertices)[vertex_indices[2]].pos);
+  bounding_box.min = cm::min((*vertices)[vertex_indices[0]].pos, cm::min((*vertices)[vertex_indices[1]].pos, (*vertices)[vertex_indices[2]].pos));
+  bounding_box.max = cm::max((*vertices)[vertex_indices[0]].pos, cm::max((*vertices)[vertex_indices[1]].pos, (*vertices)[vertex_indices[2]].pos));
   return bounding_box;
 }
 
-bool Triangle::intersect(const AABB& aabb) const
+bool triangle_aabb_intersection(const AABB& aabb, const cm::Vec3& v0, const cm::Vec3& v1, const cm::Vec3& v2)
 {
-  const AABB bounding_box = get_bounding_box();
-  return bounding_box.intersect(aabb);
+  cm::Vec3 box_half_size = (aabb.max - aabb.min) / 2.0;
+  cm::Vec3 box_center = aabb.min + box_half_size;
+
+  // move everything so that the boxcenter is in (0,0,0)
+  cm::Vec3 centered_v0 = v0 - box_center;
+  cm::Vec3 centered_v1 = v1 - box_center;
+  cm::Vec3 centered_v2 = v2 - box_center;
+
+  // first, test triangle aabb against aabb
+  cm::Vec3 min_v = cm::min(centered_v0, cm::min(centered_v1, centered_v2));
+  cm::Vec3 max_v = cm::max(centered_v0, cm::max(centered_v1, centered_v2));
+  if(min_v.x > box_half_size.x || max_v.x < -box_half_size.x) return false;
+  if(min_v.y > box_half_size.y || max_v.y < -box_half_size.y) return false;
+  if(min_v.z > box_half_size.z || max_v.z < -box_half_size.z) return false;
+
+  // second, test triangle plane against aabb
+  // compute triangle edges
+  cm::Vec3 e0 = centered_v1 - centered_v0;
+  cm::Vec3 e1 = centered_v2 - centered_v1;
+  cm::Vec3 e2 = centered_v0 - centered_v2;
+
+  cm::Vec3 normal = cm::cross(e0, e1);
+  cm::Vec3 signs = cm::sign(normal);
+  cm::Vec3 vmin = -signs * box_half_size;
+  cm::Vec3 vmax = signs * box_half_size;
+  float d = -cm::dot(normal, centered_v0);
+  if(cm::dot(normal, vmin) + d > 0.0f) return false;
+  if(cm::dot(normal, vmax) + d < 0.0f) return false;
+
+  // third, test triangle against aabb
+  const auto axis_test = [&](const cm::Vec3& a) -> bool
+  {
+    const float p0 = cm::dot(a, centered_v0);
+    const float p1 = cm::dot(a, centered_v1);
+    const float p2 = cm::dot(a, centered_v2);
+    const float rad = cm::dot(box_half_size, cm::abs(a));
+    if(std::min(p0, std::min(p1, p2)) > rad || std::max(p0, std::max(p1, p2)) < -rad) return false;
+    return true;
+  };
+  if (!axis_test(cross(cm::Vec3(1.0, 0.0, 0.0), e0))) return false;
+  if (!axis_test(cross(cm::Vec3(1.0, 0.0, 0.0), e1))) return false;
+  if (!axis_test(cross(cm::Vec3(1.0, 0.0, 0.0), e2))) return false;
+  if (!axis_test(cross(cm::Vec3(0.0, 1.0, 0.0), e0))) return false;
+  if (!axis_test(cross(cm::Vec3(0.0, 1.0, 0.0), e1))) return false;
+  if (!axis_test(cross(cm::Vec3(0.0, 1.0, 0.0), e2))) return false;
+  if (!axis_test(cross(cm::Vec3(0.0, 0.0, 1.0), e0))) return false;
+  if (!axis_test(cross(cm::Vec3(0.0, 0.0, 1.0), e1))) return false;
+  if (!axis_test(cross(cm::Vec3(0.0, 0.0, 1.0), e2))) return false;
+
+  return true;
+}
+
+bool Triangle::intersect(const AABB& aabb, bool accurate) const
+{
+  return triangle_aabb_intersection(aabb, (*vertices)[vertex_indices[0]].pos, (*vertices)[vertex_indices[1]].pos, (*vertices)[vertex_indices[2]].pos);
 }
