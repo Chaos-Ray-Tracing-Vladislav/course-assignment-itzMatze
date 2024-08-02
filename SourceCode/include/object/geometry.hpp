@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "object/aabb.hpp"
+#include "object/bvh.hpp"
 #include "object/material.hpp"
 #include "object/object.hpp"
 #include "renderer/hit_info.hpp"
@@ -19,7 +19,7 @@ public:
 private:
   InterpolatableData<Object> objects;
   std::vector<Material> materials;
-  AABB bounding_box;
+  BVH<Object> bvh;
 };
 
 Geometry interpolate(const Geometry& a, const Geometry& b, float weight);

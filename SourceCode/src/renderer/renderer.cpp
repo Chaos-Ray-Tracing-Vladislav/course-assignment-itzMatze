@@ -12,6 +12,7 @@ void Renderer::init(const SceneFile& scene_file, const std::string& name, uint32
   scene = scene_file.scene;
   resolution = scene_file.settings.resolution;
   output_name = name;
+  buckets.clear();
 
   // divide image into buckets that can be rendered concurrently
   const cm::Vec2u bucket_count = (resolution / scene_file.settings.bucket_size);
@@ -37,7 +38,8 @@ void Renderer::init(const SceneFile& scene_file, const std::string& name, uint32
 
 void Renderer::render()
 {
-  if (!scene.is_animated())
+  assert(scene);
+  if (!scene->is_animated())
   {
     std::vector<Color> pixels = render_frame();
     save_single_image(pixels, output_name, resolution, FileType::png);
@@ -45,7 +47,7 @@ void Renderer::render()
   else
   {
     ImageSeries image_series(output_name, resolution, FileType::png);
-    while (scene.step())
+    while (scene->step())
     {
       std::vector<Color> pixels = render_frame();
       image_series.save_image(pixels);
@@ -90,14 +92,14 @@ void Renderer::render_buckets(std::vector<Color>* pixels, std::atomic<uint32_t>*
       {
         path_vertices.clear();
         // add initial vertex of the camera
-        path_vertices.push_back(PathVertex{scene.get_camera().get_ray(get_camera_coordinates({x, y})), cm::Vec3(1.0, 1.0, 1.0), 0});
+        path_vertices.push_back(PathVertex{scene->get_camera().get_ray(get_camera_coordinates({x, y})), cm::Vec3(1.0, 1.0, 1.0), 0});
         Color color(0.0, 0.0, 0.0);
         // trace rays as long as there are rays left to trace
         while (!path_vertices.empty())
         {
           PathVertex path_vertex = path_vertices.back();
           path_vertices.pop_back();
-          if (scene.get_geometry().intersect(path_vertex.ray, hit_info))
+          if (scene->get_geometry().intersect(path_vertex.ray, hit_info))
           {
 #if 0
             // barycentric coordinates debug visualization
@@ -112,7 +114,7 @@ void Renderer::render_buckets(std::vector<Color>* pixels, std::atomic<uint32_t>*
             color = Color(hit_info.tex_coords.u, hit_info.tex_coords.v, 1.0);
             break;
 #else
-            Material material = (hit_info.material_idx == -1) ? Material() : scene.get_geometry().get_materials()[hit_info.material_idx];
+            Material material = (hit_info.material_idx == -1) ? Material() : scene->get_geometry().get_materials()[hit_info.material_idx];
             std::vector<BSDFSample> bsdf_samples = material.get_bsdf_samples(hit_info, path_vertex.ray.get_dir());
             for (const auto& bsdf_sample : bsdf_samples)
             {
@@ -126,16 +128,16 @@ void Renderer::render_buckets(std::vector<Color>* pixels, std::atomic<uint32_t>*
             // if material is dirac delta reflective or there are no lights there is no need to evaluate lighting
             if (!material.is_delta())
             {
-              if (scene.get_lights().size() > 0)
+              if (scene->get_lights().size() > 0)
               {
-                for (const auto& light : scene.get_lights())
+                for (const auto& light : scene->get_lights())
                 {
                   const cm::Vec3 outgoing_dir = cm::normalize(light.get_position() - hit_info.pos);
                   const float light_distance = cm::length(light.get_position() - hit_info.pos);
                   // trace shadow ray with small offset in the direction of the normal to avoid shadow acne
                   const Ray shadow_ray(hit_info.pos + RAY_START_OFFSET * hit_info.geometric_normal, outgoing_dir, RayConfig{.max_t = light_distance, .anyhit = true, .backface_culling = false});
                   HitInfo shadow_hit_info;
-                  if (scene.get_geometry().intersect(shadow_ray, shadow_hit_info)) continue;
+                  if (scene->get_geometry().intersect(shadow_ray, shadow_hit_info)) continue;
                   const float light_surface = 4.0 * M_PI * light_distance * light_distance;
                   cm::Vec3 contribution = cm::Vec3(light.get_intensity() / light_surface);
                   contribution *= path_vertex.attenuation * material.eval(hit_info, path_vertex.ray.get_dir(), outgoing_dir);
@@ -152,7 +154,7 @@ void Renderer::render_buckets(std::vector<Color>* pixels, std::atomic<uint32_t>*
           else
         {
             // background color
-            color.value += scene.get_background_color().value * path_vertex.attenuation;
+            color.value += scene->get_background_color().value * path_vertex.attenuation;
           }
         }
         // does not require synchronization because every thread writes different pixels

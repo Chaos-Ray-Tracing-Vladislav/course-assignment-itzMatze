@@ -2,12 +2,12 @@
 
 #define EPSILON 0.0001
 
-Triangle::Triangle(uint32_t idx0, uint32_t idx1, uint32_t idx2, const std::vector<Vertex>& vertices)
+Triangle::Triangle(uint32_t idx0, uint32_t idx1, uint32_t idx2, const std::shared_ptr<const std::vector<Vertex>> vertices) : vertices(vertices)
 {
   vertex_indices[0] = idx0;
   vertex_indices[1] = idx1;
   vertex_indices[2] = idx2;
-  geometric_normal = cm::normalize(cm::cross(cm::normalize(vertices[idx1].pos - vertices[idx0].pos), cm::normalize(vertices[idx2].pos - vertices[idx0].pos)));
+  geometric_normal = cm::normalize(cm::cross(cm::normalize((*vertices)[idx1].pos - (*vertices)[idx0].pos), cm::normalize((*vertices)[idx2].pos - (*vertices)[idx0].pos)));
 }
 
 void Triangle::add_normal_to_vertices(std::vector<Vertex>& vertices) const
@@ -17,11 +17,16 @@ void Triangle::add_normal_to_vertices(std::vector<Vertex>& vertices) const
   vertices[vertex_indices[2]].normal += geometric_normal;
 }
 
-bool Triangle::intersect(const Ray& ray, HitInfo& hit_info, const std::vector<Vertex>& vertices) const
+const Vertex& Triangle::get_triangle_vertex(uint32_t idx) const
 {
-  const Vertex& v0 = vertices[vertex_indices[0]];
-  const Vertex& v1 = vertices[vertex_indices[1]];
-  const Vertex& v2 = vertices[vertex_indices[2]];
+  return (*vertices)[vertex_indices[idx]];
+}
+
+bool Triangle::intersect(const Ray& ray, HitInfo& hit_info) const
+{
+  const Vertex& v0 = (*vertices)[vertex_indices[0]];
+  const Vertex& v1 = (*vertices)[vertex_indices[1]];
+  const Vertex& v2 = (*vertices)[vertex_indices[2]];
   const float dot_n_dir = cm::dot(ray.get_dir(), geometric_normal);
   // backface culling
   if (ray.config.backface_culling && dot_n_dir >= 0.0) return false;
@@ -51,4 +56,22 @@ bool Triangle::intersect(const Ray& ray, HitInfo& hit_info, const std::vector<Ve
   hit_info.normal = cm::normalize(hit_info.bary.u * v1.normal + hit_info.bary.v * v2.normal + (1.0 - hit_info.bary.u - hit_info.bary.v) * v0.normal);
   hit_info.tex_coords = hit_info.bary.u * v1.tex_coords + hit_info.bary.v * v2.tex_coords + (1.0 - hit_info.bary.u - hit_info.bary.v) * v0.tex_coords;
   return true;
+}
+
+AABB Triangle::get_bounding_box() const
+{
+  AABB bounding_box;
+  bounding_box.min = cm::min(bounding_box.min, (*vertices)[vertex_indices[0]].pos);
+  bounding_box.min = cm::min(bounding_box.min, (*vertices)[vertex_indices[1]].pos);
+  bounding_box.min = cm::min(bounding_box.min, (*vertices)[vertex_indices[2]].pos);
+  bounding_box.max = cm::max(bounding_box.max, (*vertices)[vertex_indices[0]].pos);
+  bounding_box.max = cm::max(bounding_box.max, (*vertices)[vertex_indices[1]].pos);
+  bounding_box.max = cm::max(bounding_box.max, (*vertices)[vertex_indices[2]].pos);
+  return bounding_box;
+}
+
+bool Triangle::intersect(const AABB& aabb) const
+{
+  const AABB bounding_box = get_bounding_box();
+  return bounding_box.intersect(aabb);
 }
